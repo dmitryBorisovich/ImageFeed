@@ -29,7 +29,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="mpP-d7-DHu" userLabel="Cell Image">
-                                                    <rect key="frame" x="20" y="11" width="353" height="256"/>
+                                                    <rect key="frame" x="16" y="4" width="361" height="270"/>
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
                                                             <integer key="value" value="16"/>
@@ -38,13 +38,13 @@
                                                     </userDefinedRuntimeAttributes>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="27 октября 2024" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="unU-k3-7GW" userLabel="Date Label">
-                                                    <rect key="frame" x="28.000000000000007" y="243" width="104.66666666666669" height="16"/>
+                                                    <rect key="frame" x="28.000000000000007" y="250" width="104.66666666666669" height="16"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                                     <color key="textColor" name="YP White"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dpt-h0-4UB" userLabel="Like Button">
-                                                    <rect key="frame" x="329" y="11" width="44" height="44"/>
+                                                    <rect key="frame" x="333" y="4" width="44" height="44"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="44" id="4g4-Pq-KRJ"/>
                                                         <constraint firstAttribute="width" constant="44" id="mDk-M0-RGE"/>
@@ -56,16 +56,22 @@
                                             <constraints>
                                                 <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="unU-k3-7GW" secondAttribute="trailing" constant="8" id="3hL-Ta-lff"/>
                                                 <constraint firstItem="Dpt-h0-4UB" firstAttribute="top" secondItem="mpP-d7-DHu" secondAttribute="top" id="7Vv-ne-9yR"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="unU-k3-7GW" secondAttribute="bottom" constant="8" id="9xH-TM-nkG"/>
-                                                <constraint firstItem="mpP-d7-DHu" firstAttribute="top" secondItem="n0v-xU-Rac" secondAttribute="topMargin" id="Br2-u5-dbV"/>
+                                                <constraint firstItem="mpP-d7-DHu" firstAttribute="bottom" secondItem="unU-k3-7GW" secondAttribute="bottom" constant="8" id="9xH-TM-nkG"/>
+                                                <constraint firstItem="mpP-d7-DHu" firstAttribute="top" secondItem="n0v-xU-Rac" secondAttribute="top" constant="4" id="Br2-u5-dbV"/>
                                                 <constraint firstItem="Dpt-h0-4UB" firstAttribute="trailing" secondItem="mpP-d7-DHu" secondAttribute="trailing" id="SY8-by-s0y"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="mpP-d7-DHu" secondAttribute="trailing" id="Woe-9N-BTp"/>
-                                                <constraint firstItem="mpP-d7-DHu" firstAttribute="leading" secondItem="n0v-xU-Rac" secondAttribute="leadingMargin" id="dif-Jy-ZJp"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="mpP-d7-DHu" secondAttribute="bottom" id="jXo-we-2xs"/>
+                                                <constraint firstAttribute="trailing" secondItem="mpP-d7-DHu" secondAttribute="trailing" constant="16" id="Woe-9N-BTp"/>
+                                                <constraint firstItem="mpP-d7-DHu" firstAttribute="leading" secondItem="n0v-xU-Rac" secondAttribute="leading" constant="16" id="dif-Jy-ZJp"/>
+                                                <constraint firstAttribute="bottom" secondItem="mpP-d7-DHu" secondAttribute="bottom" constant="4" id="jXo-we-2xs"/>
                                                 <constraint firstItem="unU-k3-7GW" firstAttribute="leading" secondItem="n0v-xU-Rac" secondAttribute="leadingMargin" constant="8" id="rde-RN-YXp"/>
                                             </constraints>
                                         </tableViewCellContentView>
-                                        <color key="backgroundColor" name="YP Background"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <connections>
+                                            <outlet property="cellDateLabel" destination="unU-k3-7GW" id="S1g-K8-Kya"/>
+                                            <outlet property="cellImageView" destination="mpP-d7-DHu" id="b2d-No-NOK"/>
+                                            <outlet property="cellLikeButton" destination="Dpt-h0-4UB" id="7yy-U7-NuY"/>
+                                            <outlet property="contentView" destination="n0v-xU-Rac" id="Rtf-bo-2bQ"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
@@ -89,7 +95,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="125.625" y="-2.112676056338028"/>
+            <point key="canvasLocation" x="124.42748091603053" y="-2.1126760563380285"/>
         </scene>
     </scenes>
     <resources>
