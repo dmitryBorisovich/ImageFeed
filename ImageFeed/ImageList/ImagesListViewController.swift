@@ -6,13 +6,6 @@ final class ImagesListViewController: UIViewController {
     
     private let photosName: [String] = Array(0..<20).map { "\($0)" }
     
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
-    }()
-    
     // MARK: - IB Outlets
     
     @IBOutlet private var tableView: UITableView!
@@ -23,20 +16,6 @@ final class ImagesListViewController: UIViewController {
         super.viewDidLoad()
         
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-    }
-    
-    // MARK: - Methods
-    
-    func configCell(for cell: ImagesListCell, with index: IndexPath) {
-        
-        guard let cellImage = UIImage(named: "\(index.row)") else { return }
-        
-        cell.cellImageView.image = cellImage
-        cell.cellDateLabel.text = dateFormatter.string(from: Date())
-        
-        let isLiked = index.row % 2 == 0
-        let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
-        cell.cellLikeButton.setImage(likeImage, for: .normal)
     }
 }
 
@@ -56,7 +35,7 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        configCell(for: imagesListCell, with: indexPath)
+        imagesListCell.configureCell(withIndex: indexPath)
         
         return imagesListCell
     }

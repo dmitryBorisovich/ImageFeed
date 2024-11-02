@@ -6,16 +6,36 @@ final class ImagesListCell: UITableViewCell {
     
     private var gradientLayer: CAGradientLayer?
     
-    @IBOutlet weak var cellImageView: UIImageView!
-    @IBOutlet weak var cellLikeButton: UIButton!
-    @IBOutlet weak var cellDateLabel: UILabel!
+    private lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter
+    }()
+    
+    @IBOutlet private weak var cellImageView: UIImageView!
+    @IBOutlet private weak var cellLikeButton: UIButton!
+    @IBOutlet private weak var cellDateLabel: UILabel!
         
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
     }
     
+    func configureCell(withIndex index: IndexPath) {
+        
+        guard let cellImage = UIImage(named: "\(index.row)") else { return }
+        
+        cellImageView.image = cellImage
+        cellDateLabel.text = dateFormatter.string(from: Date())
+        
+        let isLiked = index.row % 2 == 0
+        let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
+        cellLikeButton.setImage(likeImage, for: .normal)
+    }
+    
     private func configureGradient() {
+        
         gradientLayer?.removeFromSuperlayer()
             
         let gradientLayer = CAGradientLayer()
