@@ -72,15 +72,14 @@ final class SingleImageViewController: UIViewController {
             right: horizontalInset
         )
     }
-
     
     // MARK: - IB Actions
     
-    @IBAction func backButtonPressed() {
+    @IBAction private func backButtonPressed() {
         dismiss(animated: true)
     }
     
-    @IBAction func shareButtonPressed() {
+    @IBAction private func shareButtonPressed() {
         
         guard let image else { return }
         

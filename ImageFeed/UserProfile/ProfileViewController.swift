@@ -4,35 +4,16 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - Private properties
     
-    // MARK: - Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        view.backgroundColor = .ypBackground
-        
-        let userImageView = addUserImageView()
-        let userTextLabels = addUserTextLabels()
-        let logOutButton = addLogOutButton()
-        
-        setupConstraints(image: userImageView, labels: userTextLabels, button: logOutButton)
-    }
-    
-    // MARK: - Private methods
-    
-    private func addUserImageView() -> UIImageView {
+    private lazy var userImageView: UIImageView = {
         let userImageView = UIImageView()
         userImageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(userImageView)
-        
         userImageView.tintColor = .gray
         userImageView.layer.cornerRadius = 35
         userImageView.image = UIImage(named: "UserMockImage") ?? UIImage(systemName: "person.crop.circle.fill")
-        
         return userImageView
-    }
+    }()
     
-    private func addUserTextLabels() -> UIStackView {
+    private lazy var labelsStackView: UIStackView = {
         let userNameLabel = UILabel()
         userNameLabel.text = "Екатерина Новикова"
         userNameLabel.font = .systemFont(ofSize: 23, weight: .bold)
@@ -53,53 +34,57 @@ final class ProfileViewController: UIViewController {
             userIdLabel,
             userDescriptionLabel
         ])
-        
         stackView.axis = .vertical
         stackView.spacing = 8
-        
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stackView)
-        
         return stackView
-    }
+    }()
     
-    private func addLogOutButton() -> UIButton {
+    private lazy var logOutButton: UIButton = {
         let logOutButton = UIButton.systemButton(
             with: UIImage(named: "LogOut") ?? UIImage(),
             target: self,
             action: #selector(logOutButtonPressed)
         )
         logOutButton.tintColor = .ypRed
-        
         logOutButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(logOutButton)
-        
         return logOutButton
+    }()
+    
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.backgroundColor = .ypBackground
+        
+        addSubViews()
+        setupConstraints()
     }
     
-    private func setupConstraints(image: UIImageView, labels: UIStackView, button: UIButton) {
+    // MARK: - Private methods
+    
+    private func addSubViews() {
+        [userImageView, labelsStackView, logOutButton].forEach { view.addSubview($0)}
+    }
+    
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
-            image.widthAnchor.constraint(equalToConstant: 70),
-            image.heightAnchor.constraint(equalToConstant: 70),
-            image.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
-            image.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16)
-        ])
-        
-        NSLayoutConstraint.activate([
-            button.widthAnchor.constraint(equalToConstant: 44),
-            button.heightAnchor.constraint(equalToConstant: 44),
-            button.centerYAnchor.constraint(equalTo: image.centerYAnchor),
-            button.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -14)
-        ])
-        
-        NSLayoutConstraint.activate([
-            labels.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 110),
-            labels.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            labels.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 8)
+            userImageView.widthAnchor.constraint(equalToConstant: 70),
+            userImageView.heightAnchor.constraint(equalToConstant: 70),
+            userImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
+            userImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            
+            labelsStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 110),
+            labelsStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            labelsStackView.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 8),
+            
+            logOutButton.widthAnchor.constraint(equalToConstant: 44),
+            logOutButton.heightAnchor.constraint(equalToConstant: 44),
+            logOutButton.centerYAnchor.constraint(equalTo: userImageView.centerYAnchor),
+            logOutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -14)
         ])
     }
     
-    @objc private func logOutButtonPressed() {
-        
-    }
+    @objc private func logOutButtonPressed() {}
 }

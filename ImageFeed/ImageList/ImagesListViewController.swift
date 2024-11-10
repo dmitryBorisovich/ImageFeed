@@ -79,4 +79,3 @@ extension ImagesListViewController: UITableViewDelegate {
         performSegue(withIdentifier: "\(showSingleImageSegueIdentifier)", sender: indexPath)
     }
 }
-
