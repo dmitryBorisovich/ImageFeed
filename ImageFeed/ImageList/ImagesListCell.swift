@@ -32,6 +32,8 @@ final class ImagesListCell: UITableViewCell {
         let isLiked = index.row % 2 == 0
         let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
         cellLikeButton.setImage(likeImage, for: .normal)
+        
+        self.selectionStyle = .none
     }
     
     private func configureGradient() {
