@@ -43,13 +43,20 @@ class OAuth2Service {
                 do {
                     let response = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
                     OAuth2TokenStorage.shared.token = response.accessToken
-                    
                 } catch {
-                    print("Failed to parse: \(error.localizedDescription)")
+                    print("Failed to parse data: \(error.localizedDescription)")
                 }
-            case .failure(_):
-                // TODO: process code
-                print("")
+            case .failure(let error):
+                switch error {
+                case NetworkError.httpStatusCode(let statusCode):
+                    print(">>> Network error: HTTP status code \(statusCode) was received")
+                case NetworkError.urlRequestError(let error):
+                    print(">>> URL Request error: \(error.localizedDescription)")
+                case NetworkError.urlSessionError:
+                    print(">>> URL Session error")
+                default:
+                    print(">>> Unknown error: \(error.localizedDescription)")
+                }
             }
         }
         
