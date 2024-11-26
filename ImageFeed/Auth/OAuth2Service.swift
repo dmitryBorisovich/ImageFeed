@@ -36,7 +36,9 @@ final class OAuth2Service {
             switch result {
             case .success(let data):
                 do {
-                    let response = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
+                    let decoder = JSONDecoder()
+                    decoder.keyDecodingStrategy = .convertFromSnakeCase
+                    let response = try decoder.decode(OAuthTokenResponseBody.self, from: data)
                     completion(.success(response.accessToken))
                 } catch {
                     print("Failed to parse data: \(error.localizedDescription)")
