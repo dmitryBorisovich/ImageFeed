@@ -1,9 +1,16 @@
 import Foundation
 
+enum AuthServiceError: Error {
+    case invalidRequest
+}
+
 final class OAuth2Service {
     
     static let shared = OAuth2Service()
     private init() {}
+    
+    private var task: URLSessionTask?
+    private var lastCode: String?
     
     enum OAuth2ServiceConstants {
         static let baseURL = "https://unsplash.com"
@@ -21,8 +28,10 @@ final class OAuth2Service {
                 + "&grant_type=authorization_code",
                 relativeTo: baseURL
             )
-        else
-            { return nil }
+        else {
+            assertionFailure("Failed to create URL")
+            return nil
+        }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -30,6 +39,18 @@ final class OAuth2Service {
     }
     
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        
+        assert(Thread.isMainThread)
+        
+        guard lastCode != code else {
+            completion(.failure(AuthServiceError.invalidRequest))
+            return
+        }
+        
+        task?.cancel()
+        
+        lastCode = code
+        
         guard let request = makeOAuthTokenRequest(code: code) else { return }
         
         let task = URLSession.shared.data(for: request) { result in
@@ -41,13 +62,19 @@ final class OAuth2Service {
                     let response = try decoder.decode(OAuthTokenResponseBody.self, from: data)
                     completion(.success(response.accessToken))
                 } catch {
-                    print("Failed to parse data: \(error.localizedDescription)")
+                    completion(.failure(error))
                 }
             case .failure(let error):
                 completion(.failure(error))
             }
+            
+            DispatchQueue.main.async {
+                self.task = nil
+                self.lastCode = nil
+            }
         }
         
+        self.task = task
         task.resume()
     }
 }

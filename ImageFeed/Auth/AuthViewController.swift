@@ -67,8 +67,10 @@ extension AuthViewController: WebViewViewControllerDelegate {
                     print(">>> URL Request error: \(error.localizedDescription)")
                 case NetworkError.urlSessionError:
                     print(">>> URL Session error")
+                case AuthServiceError.invalidRequest:
+                    print(">>> The request has already been made")
                 default:
-                    print(">>> Unknown error: \(error.localizedDescription)")
+                    print(">>> Error: \(error.localizedDescription)")
                 }
             }
         }
