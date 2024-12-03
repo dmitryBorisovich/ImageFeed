@@ -51,7 +51,10 @@ final class OAuth2Service {
         
         lastCode = code
         
-        guard let request = makeOAuthTokenRequest(code: code) else { return }
+        guard let request = makeOAuthTokenRequest(code: code) else { 
+            completion(.failure(AuthServiceError.invalidRequest))
+            return
+        }
         
         let task = URLSession.shared.data(for: request) { result in
             switch result {
@@ -68,10 +71,8 @@ final class OAuth2Service {
                 completion(.failure(error))
             }
             
-            DispatchQueue.main.async {
-                self.task = nil
-                self.lastCode = nil
-            }
+            self.task = nil
+            self.lastCode = nil
         }
         
         self.task = task

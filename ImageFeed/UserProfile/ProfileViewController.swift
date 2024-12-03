@@ -15,16 +15,19 @@ final class ProfileViewController: UIViewController {
     
     private lazy var labelsStackView: UIStackView = {
         let userNameLabel = UILabel()
+        userNameLabel.tag = 0
         userNameLabel.text = "Екатерина Новикова"
         userNameLabel.font = .systemFont(ofSize: 23, weight: .bold)
         userNameLabel.textColor = .ypWhite
         
         let userIdLabel = UILabel()
+        userIdLabel.tag = 1
         userIdLabel.text = "@ekaterina_nov"
         userIdLabel.font = .systemFont(ofSize: 13)
         userIdLabel.textColor = .ypGray
         
         let userDescriptionLabel = UILabel()
+        userDescriptionLabel.tag = 2
         userDescriptionLabel.text = "Hello, world!"
         userDescriptionLabel.font = .systemFont(ofSize: 13)
         userDescriptionLabel.textColor = .ypWhite
@@ -60,6 +63,9 @@ final class ProfileViewController: UIViewController {
         
         addSubViews()
         setupConstraints()
+        
+        guard let profile = ProfileService.shared.profile else { return }
+        updateUserDetails(profile: profile)
     }
     
     // MARK: - Private methods
@@ -84,6 +90,14 @@ final class ProfileViewController: UIViewController {
             logOutButton.centerYAnchor.constraint(equalTo: userImageView.centerYAnchor),
             logOutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -14)
         ])
+    }
+    
+    private func updateUserDetails(profile: Profile) {
+        if let labels = labelsStackView.arrangedSubviews as? [UILabel] {
+            labels[0].text = profile.name
+            labels[1].text = profile.loginName
+            labels[2].text = profile.bio
+        }
     }
     
     @objc private func logOutButtonPressed() {}

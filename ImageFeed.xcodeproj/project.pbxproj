@@ -25,6 +25,9 @@
 		FECD58C52CD11C9E00F6DC1E /* Base in Resources */ = {isa = PBXBuildFile; fileRef = FECD58C42CD11C9E00F6DC1E /* Base */; };
 		FECD58F02CD26C0700F6DC1E /* ImagesListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECD58EF2CD26C0700F6DC1E /* ImagesListCell.swift */; };
 		FECF8D7E2CF8F2D300258995 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = FECF8D7D2CF8F2D300258995 /* ProgressHUD */; };
+		FECF8D802CFCD68D00258995 /* UIBlockingProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8D7F2CFCD68D00258995 /* UIBlockingProgressHUD.swift */; };
+		FECF8D822CFE3CEE00258995 /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8D812CFE3CED00258995 /* ProfileService.swift */; };
+		FECF8D842CFE3D5E00258995 /* ProfileModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8D832CFE3D5E00258995 /* ProfileModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +50,9 @@
 		FECD58C42CD11C9E00F6DC1E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FECD58C62CD11C9E00F6DC1E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FECD58EF2CD26C0700F6DC1E /* ImagesListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListCell.swift; sourceTree = "<group>"; };
+		FECF8D7F2CFCD68D00258995 /* UIBlockingProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBlockingProgressHUD.swift; sourceTree = "<group>"; };
+		FECF8D812CFE3CED00258995 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
+		FECF8D832CFE3D5E00258995 /* ProfileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileModels.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +99,8 @@
 			isa = PBXGroup;
 			children = (
 				FEB643A82CD692F600D1B913 /* ProfileViewController.swift */,
+				FECF8D812CFE3CED00258995 /* ProfileService.swift */,
+				FECF8D832CFE3D5E00258995 /* ProfileModels.swift */,
 			);
 			path = UserProfile;
 			sourceTree = "<group>";
@@ -128,6 +136,7 @@
 				FECD58C32CD11C9E00F6DC1E /* LaunchScreen.storyboard */,
 				FECD58BE2CD11C9B00F6DC1E /* Main.storyboard */,
 				FE4031C32CEBEAFB009776FD /* Helpers */,
+				FECF8D7F2CFCD68D00258995 /* UIBlockingProgressHUD.swift */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
@@ -228,13 +237,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				FECD58BD2CD11C9B00F6DC1E /* ImagesListViewController.swift in Sources */,
+				FECF8D822CFE3CEE00258995 /* ProfileService.swift in Sources */,
 				FECD58F02CD26C0700F6DC1E /* ImagesListCell.swift in Sources */,
 				FE4031C02CEA80C9009776FD /* OAuthTokenResponseBody.swift in Sources */,
 				FEB643A92CD692F600D1B913 /* ProfileViewController.swift in Sources */,
 				FECD58B92CD11C9B00F6DC1E /* AppDelegate.swift in Sources */,
+				FECF8D842CFE3D5E00258995 /* ProfileModels.swift in Sources */,
 				FE4031C52CEE649A009776FD /* SplashViewController.swift in Sources */,
 				FE4031B72CE60BC7009776FD /* AuthViewController.swift in Sources */,
 				FE4031B52CE5E1BF009776FD /* Constants.swift in Sources */,
+				FECF8D802CFCD68D00258995 /* UIBlockingProgressHUD.swift in Sources */,
 				FEB643AC2CD76DAE00D1B913 /* SingleImageViewController.swift in Sources */,
 				FE4031BE2CEA7C86009776FD /* URLSession+data.swift in Sources */,
 				FE4031BA2CE62303009776FD /* WebViewViewController.swift in Sources */,

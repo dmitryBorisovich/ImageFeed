@@ -9,10 +9,41 @@ final class SplashViewController: UIViewController {
         
         print(">>> SplashVC did appear")
         
-        if OAuth2TokenStorage.shared.token != nil {
+        let token = OAuth2TokenStorage.shared.token
+        if let token {
+            fetchProfile(token)
             switchToTabBarController()
         } else {
             performSegue(withIdentifier: showAuthViewSegueIdentifier, sender: nil)
+        }
+    }
+    
+    private func fetchProfile(_ token: String) {
+        UIBlockingProgressHUD.show()
+        
+        ProfileService.shared.fetchProfile(token) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+
+            guard let self = self else { return }
+
+            switch result {
+            case .success:
+                self.switchToTabBarController()
+            case .failure(let error):
+                switch error {
+                case NetworkError.httpStatusCode(let statusCode):
+                    print(">>> Network error: HTTP status code \(statusCode) was received")
+                case NetworkError.urlRequestError(let error):
+                    print(">>> URL Request error: \(error.localizedDescription)")
+                case NetworkError.urlSessionError:
+                    print(">>> URL Session error")
+                case ProfileServiceError.invalidRequest:
+                    print(">>> Invalid request")
+                default:
+                    print(">>> Error: \(error.localizedDescription)")
+                }
+                break
+            }
         }
     }
     
@@ -52,6 +83,8 @@ extension SplashViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
-        switchToTabBarController()
+        
+        guard let token = OAuth2TokenStorage.shared.token else { return }
+        fetchProfile(token)
     }
 }

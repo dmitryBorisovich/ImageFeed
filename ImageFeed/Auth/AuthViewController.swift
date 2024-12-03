@@ -48,11 +48,11 @@ extension AuthViewController: WebViewViewControllerDelegate {
     
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         
-        ProgressHUD.animate()
+        UIBlockingProgressHUD.show()
         
         OAuth2Service.shared.fetchOAuthToken(code: code) { [weak self] result in
             
-            ProgressHUD.dismiss()
+            UIBlockingProgressHUD.dismiss()
             
             switch result {
             case .success(let receivedToken):
@@ -68,7 +68,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
                 case NetworkError.urlSessionError:
                     print(">>> URL Session error")
                 case AuthServiceError.invalidRequest:
-                    print(">>> The request has already been made")
+                    print(">>> Invalid request")
                 default:
                     print(">>> Error: \(error.localizedDescription)")
                 }
