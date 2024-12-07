@@ -3,6 +3,7 @@ import UIKit
 final class SplashViewController: UIViewController {
     
     private let showAuthViewSegueIdentifier = "showAuthView"
+    private var username: String?
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -24,27 +25,30 @@ final class SplashViewController: UIViewController {
         ProfileService.shared.fetchProfile(token) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
 
-            guard let self = self else { return }
+            guard let self else { return }
 
             switch result {
-            case .success:
+            case .success(let profile):
                 self.switchToTabBarController()
+                self.username = profile.username
             case .failure(let error):
                 switch error {
                 case NetworkError.httpStatusCode(let statusCode):
-                    print(">>> Network error: HTTP status code \(statusCode) was received")
+                    print(">>> [ProfileService] Network error. HTTP status code \(statusCode) was received")
                 case NetworkError.urlRequestError(let error):
-                    print(">>> URL Request error: \(error.localizedDescription)")
+                    print(">>> [ProfileService] Network error. URL Request error: \(error.localizedDescription)")
                 case NetworkError.urlSessionError:
-                    print(">>> URL Session error")
+                    print(">>> [ProfileService] Network error. URL Session error: \(error.localizedDescription)")
                 case ProfileServiceError.invalidRequest:
-                    print(">>> Invalid request")
+                    print(">>> [ProfileService] ProfileService error. Failed to complete request")
                 default:
                     print(">>> Error: \(error.localizedDescription)")
                 }
-                break
             }
         }
+        
+        guard let username else { return }
+        ProfileImageService.shared.fetchProfileImageURL(username: username) { _ in }
     }
     
     private func switchToTabBarController() {

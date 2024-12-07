@@ -23,6 +23,21 @@ final class AuthViewController: UIViewController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style:.plain, target: nil, action: nil)
         navigationController?.navigationBar.backItem?.backBarButtonItem?.tintColor = UIColor(named: "ypBlack")
     }
+    
+    func showAuthErrorAlert() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так(",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert
+        )
+        
+        let action = UIAlertAction(title: "OK", style: .default) { _ in
+            self.dismiss(animated: true)
+        }
+        alert.addAction(action)
+        
+        present(alert, animated: true)
+    }
 }
 
 // MARK: - Extensions
@@ -62,16 +77,20 @@ extension AuthViewController: WebViewViewControllerDelegate {
             case .failure(let error):
                 switch error {
                 case NetworkError.httpStatusCode(let statusCode):
-                    print(">>> Network error: HTTP status code \(statusCode) was received")
+                    print(">>> [OAuth2Service] Network error. HTTP status code \(statusCode) was received")
                 case NetworkError.urlRequestError(let error):
-                    print(">>> URL Request error: \(error.localizedDescription)")
+                    print(">>> [OAuth2Service] Network error. URL Request error: \(error.localizedDescription)")
                 case NetworkError.urlSessionError:
-                    print(">>> URL Session error")
+                    print(">>> [OAuth2Service] Network error. URL Session error: \(error.localizedDescription)")
+                case NetworkError.invalidData(let invalidData):
+                    print(">>> [OAuth2Service] Network error. Decoding failed: \(error.localizedDescription); Received data: \(invalidData)")
                 case AuthServiceError.invalidRequest:
-                    print(">>> Invalid request")
+                    print(">>> [OAuth2Service] AuthService error. Failed to complete request")
                 default:
-                    print(">>> Error: \(error.localizedDescription)")
+                    print(">>> [OAuth2Service] Error: \(error.localizedDescription)")
                 }
+                
+                self?.showAuthErrorAlert()
             }
         }
     }

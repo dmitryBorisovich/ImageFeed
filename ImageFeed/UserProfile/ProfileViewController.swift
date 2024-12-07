@@ -4,6 +4,8 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - Private properties
     
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     private lazy var userImageView: UIImageView = {
         let userImageView = UIImageView()
         userImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -66,6 +68,17 @@ final class ProfileViewController: UIViewController {
         
         guard let profile = ProfileService.shared.profile else { return }
         updateUserDetails(profile: profile)
+        
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
     }
     
     // MARK: - Private methods
@@ -98,6 +111,14 @@ final class ProfileViewController: UIViewController {
             labels[1].text = profile.loginName
             labels[2].text = profile.bio
         }
+    }
+    
+    private func updateAvatar() {                                   // 8
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        // TODO [Sprint 11] Обновить аватар, используя Kingfisher
     }
     
     @objc private func logOutButtonPressed() {}

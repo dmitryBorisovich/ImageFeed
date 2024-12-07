@@ -13,3 +13,9 @@ struct Profile {
     let loginName: String
     let bio: String
 }
+
+struct UserResult: Decodable {
+    let small: String
+    let medium: String
+    let large: String
+}
