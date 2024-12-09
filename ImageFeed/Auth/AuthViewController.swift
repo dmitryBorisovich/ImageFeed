@@ -8,14 +8,19 @@ protocol AuthViewControllerDelegate: AnyObject {
 
 final class AuthViewController: UIViewController {
     
-    private let showWebViewSegueIdentifier = "ShowWebView"
+    // MARK: - Properties
     
+    private let showWebViewSegueIdentifier = "ShowWebView"
     weak var delegate: AuthViewControllerDelegate?
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureBackButton()
     }
+    
+    // MARK: - Private Methods
     
     private func configureBackButton() {
         let backImage = UIImage(named: "blackBackward")?.withRenderingMode(.alwaysOriginal)
@@ -71,7 +76,6 @@ extension AuthViewController {
 extension AuthViewController: WebViewViewControllerDelegate {
     
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        
         UIBlockingProgressHUD.show()
         
         OAuth2Service.shared.fetchOAuthToken(code: code) { [weak self] result in
@@ -82,7 +86,6 @@ extension AuthViewController: WebViewViewControllerDelegate {
             case .success(let receivedToken):
                 guard let self else { return }
                 saveTokenToKeyChain(token: receivedToken)
-//                OAuth2TokenStorage.shared.token = receivedToken
                 delegate?.didAuthenticate(self)
             case .failure(let error):
                 switch error {

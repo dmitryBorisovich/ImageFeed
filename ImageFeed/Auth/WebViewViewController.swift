@@ -39,28 +39,6 @@ final class WebViewViewController: UIViewController {
         )
     }
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        
-//        webView.addObserver(
-//            self,
-//            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-//            options: .new, 
-//            context: nil
-//        )
-//        updateProgress()
-//    }
-    
-//    override func viewDidDisappear(_ animated: Bool) {
-//        super.viewDidDisappear(animated)
-//        
-//        webView.removeObserver(
-//            self,
-//            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-//            context: nil
-//        )
-//    }
-    
     // MARK: - Methods
 
     private func updateProgress() {

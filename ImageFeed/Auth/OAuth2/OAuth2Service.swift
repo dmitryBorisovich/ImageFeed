@@ -7,6 +7,8 @@ enum AuthServiceError: Error {
 
 final class OAuth2Service {
     
+    // MARK: - Properties
+    
     static let shared = OAuth2Service()
     private init() {}
     
@@ -16,6 +18,8 @@ final class OAuth2Service {
     enum OAuth2ServiceConstants {
         static let baseURL = "https://unsplash.com"
     }
+    
+    // MARK: - Methods
     
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         let baseURL = URL(string: OAuth2ServiceConstants.baseURL)
@@ -30,7 +34,7 @@ final class OAuth2Service {
                 relativeTo: baseURL
             )
         else {
-            assertionFailure("Failed to create URL")
+            assertionFailure(">>> [OAuth2Service] Failed to create URL")
             return nil
         }
         
@@ -40,16 +44,13 @@ final class OAuth2Service {
     }
     
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
-        
         assert(Thread.isMainThread)
         
         guard lastCode != code else {
             completion(.failure(AuthServiceError.extraRequest))
             return
         }
-        
         task?.cancel()
-        
         lastCode = code
         
         guard let request = makeOAuthTokenRequest(code: code) else { 
@@ -70,27 +71,7 @@ final class OAuth2Service {
             self.lastCode = nil
         }
         
-//        let task = URLSession.shared.data(for: request) { result in
-//            switch result {
-//            case .success(let data):
-//                do {
-//                    let decoder = JSONDecoder()
-//                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-//                    let response = try decoder.decode(OAuthTokenResponseBody.self, from: data)
-//                    completion(.success(response.accessToken))
-//                } catch {
-//                    completion(.failure(error))
-//                }
-//            case .failure(let error):
-//                completion(.failure(error))
-//            }
-//            
-//            self.task = nil
-//            self.lastCode = nil
-//        }
-        
         self.task = task
         task.resume()
     }
 }
-

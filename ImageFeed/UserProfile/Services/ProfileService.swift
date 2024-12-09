@@ -7,11 +7,15 @@ enum ProfileServiceError: Error {
 
 final class ProfileService {
     
+    // MARK: - Properties
+    
     static let shared = ProfileService()
     private init() {}
     
     private var task: URLSessionTask?
     private(set) var profile: Profile?
+    
+    // MARK: - Methods
     
     private func makeUsersProfileRequest(token: String) -> URLRequest? {
         guard
@@ -21,7 +25,7 @@ final class ProfileService {
                 relativeTo: Constants.defaultBaseURL
             )
         else {
-            assertionFailure("Failed to create URL")
+            assertionFailure(">>> [ProfileService] Failed to create URL")
             return nil
         }
 
@@ -31,7 +35,6 @@ final class ProfileService {
     }
     
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
-        
         assert(Thread.isMainThread)
         
         if task != nil { 

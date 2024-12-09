@@ -8,6 +8,8 @@ enum ProfileImageServiceError: Error {
 
 final class ProfileImageService {
     
+    // MARK: - Properties
+    
     static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     
     static let shared = ProfileImageService()
@@ -16,13 +18,12 @@ final class ProfileImageService {
     private var task: URLSessionTask?
     private(set) var avatarURL: String?
     
+    // MARK: - Methods
+    
     private func makeProfileImageRequest(username: String) -> URLRequest? {
-        
         guard
             let token = KeychainWrapper.standard.string(forKey: "Auth token")
-        else {
-            return nil
-        }
+        else { return nil }
         
         guard
             let url = URL(
@@ -31,7 +32,7 @@ final class ProfileImageService {
                 relativeTo: Constants.defaultBaseURL
             )
         else {
-            print("Failed to create URL for username: \(username)")
+            assertionFailure(">>> [ProfileImageService] Failed to create URL for username: \(username)")
             return nil
         }
 
@@ -41,7 +42,6 @@ final class ProfileImageService {
     }
     
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
-        
         assert(Thread.isMainThread)
         
         if task != nil {
@@ -79,5 +79,4 @@ final class ProfileImageService {
         self.task = task
         task.resume()
     }
-    
 }

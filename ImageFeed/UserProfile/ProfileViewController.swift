@@ -80,7 +80,7 @@ final class ProfileViewController: UIViewController {
                 queue: .main
             ) { [weak self] _ in
                 guard let self else { return }
-                print("Notification received, updating avatar")
+                print(">>> [ProfileViewController] Notification received, updating avatar")
                 updateAvatar()
             }
         
@@ -120,13 +120,10 @@ final class ProfileViewController: UIViewController {
     }
     
     private func updateAvatar() {
-
         guard
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
-        else {
-            return
-        }
+        else { return }
         
         print(">>> [ProfileViewController] Updating avatar with URL: \(profileImageURL)\n")
         
