@@ -1,6 +1,8 @@
 import Foundation
+import SwiftKeychainWrapper
 
 enum ProfileImageServiceError: Error {
+    case extraRequest
     case invalidRequest
 }
 
@@ -14,17 +16,22 @@ final class ProfileImageService {
     private var task: URLSessionTask?
     private(set) var avatarURL: String?
     
-    private func makeProfileImageRequest(token: String) -> URLRequest? {
-        guard let profile = ProfileService.shared.profile else { return nil }
+    private func makeProfileImageRequest(username: String) -> URLRequest? {
+        
+        guard
+            let token = KeychainWrapper.standard.string(forKey: "Auth token")
+        else {
+            return nil
+        }
         
         guard
             let url = URL(
-                string: "/users/\(profile.username)"
+                string: "/users/\(username)"
                 + "?client_id=\(Constants.accessKey)",
                 relativeTo: Constants.defaultBaseURL
             )
         else {
-            assertionFailure("Failed to create URL")
+            print("Failed to create URL for username: \(username)")
             return nil
         }
 
@@ -35,22 +42,15 @@ final class ProfileImageService {
     
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         
-        NotificationCenter.default
-            .post(
-                name: ProfileImageService.didChangeNotification,
-                object: self,
-                userInfo: ["URL": avatarURL as Any]
-            )
-        
         assert(Thread.isMainThread)
         
         if task != nil {
-            completion(.failure(ProfileImageServiceError.invalidRequest))
+            completion(.failure(ProfileImageServiceError.extraRequest))
             return
         }
         
-        guard let token = OAuth2TokenStorage.shared.token,
-              let request = makeProfileImageRequest(token: token)
+        guard
+            let request = makeProfileImageRequest(username: username)
         else {
             completion(.failure(ProfileImageServiceError.invalidRequest))
             return
@@ -60,8 +60,15 @@ final class ProfileImageService {
         let task = urlSession.objectTask(for: request) { (result: Result<UserResult, Error>) in
             switch result {
             case .success(let userImage):
-                self.avatarURL = userImage.small
-                completion(.success(userImage.small))
+                let profileImageURL = userImage.profileImage.small
+                self.avatarURL = profileImageURL
+                NotificationCenter.default
+                    .post(
+                        name: ProfileImageService.didChangeNotification,
+                        object: self,
+                        userInfo: ["URL": profileImageURL]
+                    )
+                completion(.success(userImage.profileImage.small))
             case .failure(let error):
                 completion(.failure(error))
             }

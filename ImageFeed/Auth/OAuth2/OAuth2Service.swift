@@ -1,6 +1,7 @@
 import Foundation
 
 enum AuthServiceError: Error {
+    case extraRequest
     case invalidRequest
 }
 
@@ -43,7 +44,7 @@ final class OAuth2Service {
         assert(Thread.isMainThread)
         
         guard lastCode != code else {
-            completion(.failure(AuthServiceError.invalidRequest))
+            completion(.failure(AuthServiceError.extraRequest))
             return
         }
         

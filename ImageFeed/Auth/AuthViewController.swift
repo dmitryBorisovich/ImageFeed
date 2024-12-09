@@ -1,4 +1,5 @@
 import UIKit
+import SwiftKeychainWrapper
 import ProgressHUD
 
 protocol AuthViewControllerDelegate: AnyObject {
@@ -24,7 +25,7 @@ final class AuthViewController: UIViewController {
         navigationController?.navigationBar.backItem?.backBarButtonItem?.tintColor = UIColor(named: "ypBlack")
     }
     
-    func showAuthErrorAlert() {
+    private func showAuthErrorAlert() {
         let alert = UIAlertController(
             title: "Что-то пошло не так(",
             message: "Не удалось войти в систему",
@@ -37,6 +38,14 @@ final class AuthViewController: UIViewController {
         alert.addAction(action)
         
         present(alert, animated: true)
+    }
+    
+    private func saveTokenToKeyChain(token: String) {
+        let isSuccess = KeychainWrapper.standard.set(token, forKey: "Auth token")
+        guard isSuccess else {
+            print("KeyChain adding of token had failed")
+            return
+        }
     }
 }
 
@@ -72,7 +81,8 @@ extension AuthViewController: WebViewViewControllerDelegate {
             switch result {
             case .success(let receivedToken):
                 guard let self else { return }
-                OAuth2TokenStorage.shared.token = receivedToken
+                saveTokenToKeyChain(token: receivedToken)
+//                OAuth2TokenStorage.shared.token = receivedToken
                 delegate?.didAuthenticate(self)
             case .failure(let error):
                 switch error {
@@ -86,6 +96,8 @@ extension AuthViewController: WebViewViewControllerDelegate {
                     print(">>> [OAuth2Service] Network error. Decoding failed: \(error.localizedDescription); Received data: \(invalidData)")
                 case AuthServiceError.invalidRequest:
                     print(">>> [OAuth2Service] AuthService error. Failed to complete request")
+                case AuthServiceError.extraRequest:
+                    print(">>> [OAuth2Service] Attempting to execute a request instead of the current one")
                 default:
                     print(">>> [OAuth2Service] Error: \(error.localizedDescription)")
                 }

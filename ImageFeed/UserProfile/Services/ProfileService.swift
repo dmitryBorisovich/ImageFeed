@@ -1,6 +1,7 @@
 import Foundation
 
 enum ProfileServiceError: Error {
+    case extraRequest
     case invalidRequest
 }
 
@@ -34,7 +35,7 @@ final class ProfileService {
         assert(Thread.isMainThread)
         
         if task != nil { 
-            completion(.failure(ProfileServiceError.invalidRequest))
+            completion(.failure(ProfileServiceError.extraRequest))
             return
         }
         
@@ -61,31 +62,6 @@ final class ProfileService {
             
             self.task = nil
         }
-        
-//        let task = URLSession.shared.data(for: request) { result in
-//            switch result {
-//            case .success(let data):
-//                do {
-//                    let decoder = JSONDecoder()
-//                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-//                    let response = try decoder.decode(ProfileResult.self, from: data)
-//                    let userInfo = Profile(
-//                        username: response.username,
-//                        name: "\(response.firstName) \(response.lastName)",
-//                        loginName: "@\(response.username)",
-//                        bio: response.bio ?? ""
-//                    )
-//                    self.profile = userInfo
-//                    completion(.success(userInfo))
-//                } catch {
-//                    completion(.failure(error))
-//                }
-//            case .failure(let error):
-//                completion(.failure(error))
-//            }
-//            
-//            self.task = nil
-//        }
         
         self.task = task
         task.resume()

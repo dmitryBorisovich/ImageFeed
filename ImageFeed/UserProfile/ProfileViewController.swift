@@ -1,4 +1,5 @@
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
@@ -11,7 +12,7 @@ final class ProfileViewController: UIViewController {
         userImageView.translatesAutoresizingMaskIntoConstraints = false
         userImageView.tintColor = .gray
         userImageView.layer.cornerRadius = 35
-        userImageView.image = UIImage(named: "UserMockImage") ?? UIImage(systemName: "person.crop.circle.fill")
+        userImageView.image = UIImage(systemName: "person.crop.circle.fill")
         return userImageView
     }()
     
@@ -61,12 +62,15 @@ final class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(">>> [ProfileViewController] ProfileVC did load")
+        
         view.backgroundColor = .ypBackground
         
         addSubViews()
         setupConstraints()
         
         guard let profile = ProfileService.shared.profile else { return }
+        
         updateUserDetails(profile: profile)
         
         profileImageServiceObserver = NotificationCenter.default
@@ -76,8 +80,10 @@ final class ProfileViewController: UIViewController {
                 queue: .main
             ) { [weak self] _ in
                 guard let self else { return }
-                self.updateAvatar()
+                print("Notification received, updating avatar")
+                updateAvatar()
             }
+        
         updateAvatar()
     }
     
@@ -113,12 +119,24 @@ final class ProfileViewController: UIViewController {
         }
     }
     
-    private func updateAvatar() {                                   // 8
+    private func updateAvatar() {
+
         guard
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
-        else { return }
-        // TODO [Sprint 11] Обновить аватар, используя Kingfisher
+        else {
+            return
+        }
+        
+        print(">>> [ProfileViewController] Updating avatar with URL: \(profileImageURL)\n")
+        
+        userImageView.layer.cornerRadius = 35
+        userImageView.clipsToBounds = true
+    
+        userImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(systemName: "person.crop.circle.fill")
+        )
     }
     
     @objc private func logOutButtonPressed() {}
