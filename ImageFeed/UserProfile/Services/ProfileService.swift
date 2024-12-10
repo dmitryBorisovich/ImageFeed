@@ -53,7 +53,7 @@ final class ProfileService {
             case .success(let userInfo):
                 let profile = Profile(
                     username: userInfo.username,
-                    name: "\(userInfo.firstName) \(userInfo.lastName)",
+                    name: "\(userInfo.firstName) \(userInfo.lastName ?? "")",
                     loginName: "@\(userInfo.username)",
                     bio: userInfo.bio ?? ""
                 )
