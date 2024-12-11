@@ -22,7 +22,7 @@ final class ProfileImageService {
     
     private func makeProfileImageRequest(username: String) -> URLRequest? {
         guard
-            let token = KeychainWrapper.standard.string(forKey: "Auth token")
+            let token = OAuth2TokenStorage.shared.token
         else { return nil }
         
         guard

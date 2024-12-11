@@ -16,25 +16,31 @@ final class ProfileViewController: UIViewController {
         return userImageView
     }()
     
-    private lazy var labelsStackView: UIStackView = {
+    private lazy var userNameLabel: UILabel = {
         let userNameLabel = UILabel()
-        userNameLabel.tag = 0
         userNameLabel.text = "Екатерина Новикова"
         userNameLabel.font = .systemFont(ofSize: 23, weight: .bold)
         userNameLabel.textColor = .ypWhite
-        
+        return userNameLabel
+    }()
+    
+    private lazy var userIdLabel: UILabel = {
         let userIdLabel = UILabel()
-        userIdLabel.tag = 1
         userIdLabel.text = "@ekaterina_nov"
         userIdLabel.font = .systemFont(ofSize: 13)
         userIdLabel.textColor = .ypGray
-        
+        return userIdLabel
+    }()
+    
+    private lazy var userDescriptionLabel: UILabel = {
         let userDescriptionLabel = UILabel()
-        userDescriptionLabel.tag = 2
         userDescriptionLabel.text = "Hello, world!"
         userDescriptionLabel.font = .systemFont(ofSize: 13)
         userDescriptionLabel.textColor = .ypWhite
-        
+        return userDescriptionLabel
+    }()
+    
+    private lazy var labelsStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [
             userNameLabel,
             userIdLabel,
@@ -64,10 +70,12 @@ final class ProfileViewController: UIViewController {
         
         print(">>> [ProfileViewController] ProfileVC did load")
         
-        view.backgroundColor = .ypBackground
-        
         addSubViews()
         setupConstraints()
+        
+        view.backgroundColor = .ypBackground
+        userImageView.layer.cornerRadius = 35
+        userImageView.clipsToBounds = true
         
         guard let profile = ProfileService.shared.profile else { return }
         
@@ -112,11 +120,9 @@ final class ProfileViewController: UIViewController {
     }
     
     private func updateUserDetails(profile: Profile) {
-        if let labels = labelsStackView.arrangedSubviews as? [UILabel] {
-            labels[0].text = profile.name
-            labels[1].text = profile.loginName
-            labels[2].text = profile.bio
-        }
+        userNameLabel.text = profile.name
+        userIdLabel.text = profile.loginName
+        userDescriptionLabel.text = profile.bio
     }
     
     private func updateAvatar() {
@@ -126,9 +132,6 @@ final class ProfileViewController: UIViewController {
         else { return }
         
         print(">>> [ProfileViewController] Updating avatar with URL: \(profileImageURL)\n")
-        
-        userImageView.layer.cornerRadius = 35
-        userImageView.clipsToBounds = true
     
         userImageView.kf.setImage(
             with: url,

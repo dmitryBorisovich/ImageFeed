@@ -26,16 +26,16 @@ final class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
         print(">>> [SplashViewController] SplashVC did appear")
         
-        if let token = KeychainWrapper.standard.string(forKey: "Auth token") {
+        if let token = OAuth2TokenStorage.shared.token {
             fetchProfile(token)
         } else {
-            let navigationController = UINavigationController()
-            guard 
-                let authViewController = navigationController.viewControllers[0] as? AuthViewController
-            else { return }
+            let authViewController = AuthViewController()
             authViewController.delegate = self
             authViewController.modalPresentationStyle = .fullScreen
-            present(authViewController, animated: true, completion: nil)
+            
+            let navigationController = UINavigationController(rootViewController: authViewController)
+            
+            present(navigationController, animated: true)
         }
     }
     
@@ -145,7 +145,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
         
-        guard let token = KeychainWrapper.standard.string(forKey: "Auth token") else { return }
+        guard let token = OAuth2TokenStorage.shared.token else { return }
         fetchProfile(token)
     }
 }
