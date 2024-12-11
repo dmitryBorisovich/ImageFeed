@@ -1,4 +1,6 @@
 import UIKit
+import SwiftKeychainWrapper
+import ProgressHUD
 
 protocol AuthViewControllerDelegate: AnyObject {
     func didAuthenticate(_ vc: AuthViewController)
@@ -6,14 +8,19 @@ protocol AuthViewControllerDelegate: AnyObject {
 
 final class AuthViewController: UIViewController {
     
-    private let showWebViewSegueIdentifier = "ShowWebView"
+    // MARK: - Properties
     
+    private let showWebViewSegueIdentifier = "ShowWebView"
     weak var delegate: AuthViewControllerDelegate?
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureBackButton()
     }
+    
+    // MARK: - Private Methods
     
     private func configureBackButton() {
         let backImage = UIImage(named: "blackBackward")?.withRenderingMode(.alwaysOriginal)
@@ -21,6 +28,29 @@ final class AuthViewController: UIViewController {
         navigationController?.navigationBar.backIndicatorTransitionMaskImage = backImage
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style:.plain, target: nil, action: nil)
         navigationController?.navigationBar.backItem?.backBarButtonItem?.tintColor = UIColor(named: "ypBlack")
+    }
+    
+    private func showAuthErrorAlert() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так(",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert
+        )
+        
+        let action = UIAlertAction(title: "OK", style: .default) { _ in
+            self.dismiss(animated: true)
+        }
+        alert.addAction(action)
+        
+        present(alert, animated: true)
+    }
+    
+    private func saveTokenToKeyChain(token: String) {
+        let isSuccess = KeychainWrapper.standard.set(token, forKey: "Auth token")
+        guard isSuccess else {
+            print("KeyChain adding of token had failed")
+            return
+        }
     }
 }
 
@@ -46,8 +76,12 @@ extension AuthViewController {
 extension AuthViewController: WebViewViewControllerDelegate {
     
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
+        UIBlockingProgressHUD.show()
         
         OAuth2Service.shared.fetchOAuthToken(code: code) { [weak self] result in
+            
+            UIBlockingProgressHUD.dismiss()
+            
             switch result {
             case .success(let receivedToken):
                 guard let self else { return }
@@ -56,14 +90,22 @@ extension AuthViewController: WebViewViewControllerDelegate {
             case .failure(let error):
                 switch error {
                 case NetworkError.httpStatusCode(let statusCode):
-                    print(">>> Network error: HTTP status code \(statusCode) was received")
+                    print(">>> [OAuth2Service] Network error. HTTP status code \(statusCode) was received")
                 case NetworkError.urlRequestError(let error):
-                    print(">>> URL Request error: \(error.localizedDescription)")
+                    print(">>> [OAuth2Service] Network error. URL Request error: \(error.localizedDescription)")
                 case NetworkError.urlSessionError:
-                    print(">>> URL Session error")
+                    print(">>> [OAuth2Service] Network error. URL Session error: \(error.localizedDescription)")
+                case NetworkError.invalidData(let invalidData):
+                    print(">>> [OAuth2Service] Network error. Decoding failed: \(error.localizedDescription); Received data: \(invalidData)")
+                case AuthServiceError.invalidRequest:
+                    print(">>> [OAuth2Service] AuthService error. Failed to complete request")
+                case AuthServiceError.extraRequest:
+                    print(">>> [OAuth2Service] Attempting to execute a request instead of the current one")
                 default:
-                    print(">>> Unknown error: \(error.localizedDescription)")
+                    print(">>> [OAuth2Service] Error: \(error.localizedDescription)")
                 }
+                
+                self?.showAuthErrorAlert()
             }
         }
     }

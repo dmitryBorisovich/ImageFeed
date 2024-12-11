@@ -49,7 +49,7 @@ final class SingleImageViewController: UIViewController {
         
         let hScale = visibleRectSize.width / imageSize.width
         let vScale = visibleRectSize.height / imageSize.height
-        let scale = min(maxZoomScale, max(minZoomScale, max(hScale, vScale)))
+        let scale = min(maxZoomScale, max(minZoomScale, min(hScale, vScale)))
         
         scrollView.setZoomScale(scale, animated: false)
         scrollView.layoutIfNeeded()
@@ -80,7 +80,6 @@ final class SingleImageViewController: UIViewController {
     }
     
     @IBAction private func shareButtonPressed() {
-        
         guard let image else { return }
         
         let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)

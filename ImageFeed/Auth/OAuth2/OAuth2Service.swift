@@ -1,13 +1,25 @@
 import Foundation
 
+enum AuthServiceError: Error {
+    case extraRequest
+    case invalidRequest
+}
+
 final class OAuth2Service {
+    
+    // MARK: - Properties
     
     static let shared = OAuth2Service()
     private init() {}
     
+    private var task: URLSessionTask?
+    private var lastCode: String?
+    
     enum OAuth2ServiceConstants {
         static let baseURL = "https://unsplash.com"
     }
+    
+    // MARK: - Methods
     
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         let baseURL = URL(string: OAuth2ServiceConstants.baseURL)
@@ -21,8 +33,10 @@ final class OAuth2Service {
                 + "&grant_type=authorization_code",
                 relativeTo: baseURL
             )
-        else
-            { return nil }
+        else {
+            assertionFailure(">>> [OAuth2Service] Failed to create URL")
+            return nil
+        }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -30,25 +44,34 @@ final class OAuth2Service {
     }
     
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
-        guard let request = makeOAuthTokenRequest(code: code) else { return }
+        assert(Thread.isMainThread)
         
-        let task = URLSession.shared.data(for: request) { result in
+        guard lastCode != code else {
+            completion(.failure(AuthServiceError.extraRequest))
+            return
+        }
+        task?.cancel()
+        lastCode = code
+        
+        guard let request = makeOAuthTokenRequest(code: code) else { 
+            completion(.failure(AuthServiceError.invalidRequest))
+            return
+        }
+        
+        let urlSession = URLSession.shared
+        let task = urlSession.objectTask(for: request) { (result: Result<OAuthTokenResponseBody, Error>) in
             switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-                    let response = try decoder.decode(OAuthTokenResponseBody.self, from: data)
-                    completion(.success(response.accessToken))
-                } catch {
-                    print("Failed to parse data: \(error.localizedDescription)")
-                }
+            case .success(let resultModel):
+                completion(.success(resultModel.accessToken))
             case .failure(let error):
                 completion(.failure(error))
             }
+            
+            self.task = nil
+            self.lastCode = nil
         }
         
+        self.task = task
         task.resume()
     }
 }
-
