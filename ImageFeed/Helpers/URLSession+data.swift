@@ -5,6 +5,7 @@ enum NetworkError: Error {
     case urlRequestError(Error)
     case urlSessionError
     case invalidData(String)
+    case noData
 }
 
 extension URLSession {
@@ -26,11 +27,14 @@ extension URLSession {
                     if let receivedData = String(data: data, encoding: .utf8) {
                         print(receivedData)
                     }
+                    print(">>> [dataTask] Network error. HTTP status code \(statusCode) was received")
                     fulfillCompletionOnTheMainThread(.failure(NetworkError.httpStatusCode(statusCode)))
                 }
             } else if let error {
+                print(">>> [dataTask] Network error. URL Request error: \(error.localizedDescription)")
                 fulfillCompletionOnTheMainThread(.failure(NetworkError.urlRequestError(error)))
             } else {
+                print(">>> [dataTask] Network error. URL Session error")
                 fulfillCompletionOnTheMainThread(.failure(NetworkError.urlSessionError))
             }
         })
@@ -51,11 +55,16 @@ extension URLSession {
                     let response = try decoder.decode(T.self, from: data)
                     completion(.success(response))
                 } catch {
-                    let incorrectData = String(data: data, encoding: .utf8) ?? ""
-                    completion(.failure(NetworkError.invalidData(incorrectData)))
+                    let invalidData = String(data: data, encoding: .utf8) ?? ""
+                    print("""
+                        >>> [objectTask] Network error. Decoding failed: \(error.localizedDescription)
+                        Received data: \(invalidData)
+                    """)
+                    completion(.failure(NetworkError.invalidData(invalidData)))
                 }
             case .failure(let error):
-                completion(.failure(error))
+                print(">>> [dataTask] Network error. No data to decode: \(error.localizedDescription)")
+                completion(.failure(NetworkError.noData))
             }
         }
         return task

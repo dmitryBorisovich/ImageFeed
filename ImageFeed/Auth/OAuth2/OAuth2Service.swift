@@ -47,13 +47,15 @@ final class OAuth2Service {
         assert(Thread.isMainThread)
         
         guard lastCode != code else {
+            print(">>> [OAuth2Service] The request is already in progress, no extra request needed")
             completion(.failure(AuthServiceError.extraRequest))
             return
         }
         task?.cancel()
         lastCode = code
         
-        guard let request = makeOAuthTokenRequest(code: code) else { 
+        guard let request = makeOAuthTokenRequest(code: code) else {
+            print(">>> [OAuth2Service] Failed to create the request")
             completion(.failure(AuthServiceError.invalidRequest))
             return
         }

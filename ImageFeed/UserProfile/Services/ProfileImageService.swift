@@ -1,5 +1,4 @@
 import Foundation
-import SwiftKeychainWrapper
 
 enum ProfileImageServiceError: Error {
     case extraRequest
@@ -45,6 +44,7 @@ final class ProfileImageService {
         assert(Thread.isMainThread)
         
         if task != nil {
+            print(">>> [ProfileImageService] The request is already in progress, no extra request needed")
             completion(.failure(ProfileImageServiceError.extraRequest))
             return
         }
@@ -52,6 +52,7 @@ final class ProfileImageService {
         guard
             let request = makeProfileImageRequest(username: username)
         else {
+            print(">>> [ProfileImageService] Failed to create the request")
             completion(.failure(ProfileImageServiceError.invalidRequest))
             return
         }

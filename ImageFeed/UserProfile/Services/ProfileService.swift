@@ -37,12 +37,14 @@ final class ProfileService {
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         
-        if task != nil { 
+        if task != nil {
+            print(">>> [ProfileService] The request is already in progress, no extra request needed")
             completion(.failure(ProfileServiceError.extraRequest))
             return
         }
         
         guard let request = makeUsersProfileRequest(token: token) else {
+            print(">>> [ProfileService] Failed to create the request")
             completion(.failure(ProfileServiceError.invalidRequest))
             return
         }
