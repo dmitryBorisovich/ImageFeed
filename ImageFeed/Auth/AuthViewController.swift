@@ -87,24 +87,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
                 guard let self else { return }
                 OAuth2TokenStorage.shared.token = receivedToken
                 delegate?.didAuthenticate(self)
-            case .failure(let error):
-                switch error {
-                case NetworkError.httpStatusCode(let statusCode):
-                    print(">>> [OAuth2Service] Network error. HTTP status code \(statusCode) was received")
-                case NetworkError.urlRequestError(let error):
-                    print(">>> [OAuth2Service] Network error. URL Request error: \(error.localizedDescription)")
-                case NetworkError.urlSessionError:
-                    print(">>> [OAuth2Service] Network error. URL Session error: \(error.localizedDescription)")
-                case NetworkError.invalidData(let invalidData):
-                    print(">>> [OAuth2Service] Network error. Decoding failed: \(error.localizedDescription); Received data: \(invalidData)")
-                case AuthServiceError.invalidRequest:
-                    print(">>> [OAuth2Service] AuthService error. Failed to complete request")
-                case AuthServiceError.extraRequest:
-                    print(">>> [OAuth2Service] Attempting to execute a request instead of the current one")
-                default:
-                    print(">>> [OAuth2Service] Error: \(error.localizedDescription)")
-                }
-                
+            case .failure:
                 self?.showAuthErrorAlert()
             }
         }

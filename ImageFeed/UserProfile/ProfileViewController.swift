@@ -73,7 +73,7 @@ final class ProfileViewController: UIViewController {
         addSubViews()
         setupConstraints()
         
-        view.backgroundColor = .ypBackground
+        view.backgroundColor = .ypBlack
         userImageView.layer.cornerRadius = 35
         userImageView.clipsToBounds = true
         
