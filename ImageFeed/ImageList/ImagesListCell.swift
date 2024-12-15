@@ -2,6 +2,8 @@ import UIKit
 
 final class ImagesListCell: UITableViewCell {
     
+    // MARK: - Properties
+    
     static let reuseIdentifier = "ImagesListCell"
     
     private var gradientLayer: CAGradientLayer?
@@ -16,6 +18,8 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet private weak var cellImageView: UIImageView!
     @IBOutlet private weak var cellLikeButton: UIButton!
     @IBOutlet private weak var cellDateLabel: UILabel!
+    
+    // MARK: - Methods
         
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -23,7 +27,6 @@ final class ImagesListCell: UITableViewCell {
     }
     
     func configureCell(withIndex index: IndexPath) {
-        
         guard let cellImage = UIImage(named: "\(index.row)") else { return }
         
         cellImageView.image = cellImage
@@ -37,7 +40,6 @@ final class ImagesListCell: UITableViewCell {
     }
     
     private func configureGradient() {
-        
         gradientLayer?.removeFromSuperlayer()
             
         let gradientLayer = CAGradientLayer()
