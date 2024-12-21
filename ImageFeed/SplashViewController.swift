@@ -77,18 +77,13 @@ final class SplashViewController: UIViewController {
             return
         }
         
-        let tabBarController = UIStoryboard(name: "Main", bundle: .main)
-            .instantiateViewController(withIdentifier: "TabBarViewController")
+        let tabBarController = TabBarController()
            
         window.rootViewController = tabBarController
     }
     
     private func switchToAuthViewController() {
-        let storyboard = UIStoryboard(name: "Main", bundle: .main)
-        
-        guard let authViewController = storyboard.instantiateViewController(
-            withIdentifier: "AuthViewController"
-        ) as? AuthViewController else { return }
+        let authViewController = AuthViewController()
         authViewController.delegate = self
         
         let navigationController = UINavigationController(rootViewController: authViewController)

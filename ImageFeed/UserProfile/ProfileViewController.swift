@@ -70,12 +70,7 @@ final class ProfileViewController: UIViewController {
         
         print(">>> [ProfileViewController] ProfileVC did load")
         
-        addSubViews()
-        setupConstraints()
-        
-        view.backgroundColor = .ypBlack
-        userImageView.layer.cornerRadius = 35
-        userImageView.clipsToBounds = true
+        setUpScreen()
         
         guard let profile = ProfileService.shared.profile else { return }
         
@@ -97,11 +92,15 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - Private methods
     
-    private func addSubViews() {
-        [userImageView, labelsStackView, logOutButton].forEach { view.addSubview($0)}
+    private func setUpScreen() {
+        view.backgroundColor = .ypBlack
+        [userImageView, labelsStackView, logOutButton].forEach { view.addSubview($0) }
+        setUpConstraints()
+        userImageView.layer.cornerRadius = 35
+        userImageView.clipsToBounds = true
     }
     
-    private func setupConstraints() {
+    private func setUpConstraints() {
         NSLayoutConstraint.activate([
             userImageView.widthAnchor.constraint(equalToConstant: 70),
             userImageView.heightAnchor.constraint(equalToConstant: 70),
