@@ -83,8 +83,11 @@ extension ImagesListViewController: UITableViewDelegate {
         return image.size.height * scaleFactor + imageInsets.top + imageInsets.bottom
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { 
-//        performSegue(withIdentifier: "\(showSingleImageSegueIdentifier)", sender: indexPath)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switchToSingleImageVC(indexPath: indexPath)
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        // TODO: fetchPhotosNextPage()
     }
 }

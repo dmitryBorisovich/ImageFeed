@@ -34,6 +34,10 @@
 		FECF8D972D0A0D1A00258995 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8D962D0A0D1A00258995 /* Profile.swift */; };
 		FECF8D992D0A0D5000258995 /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8D982D0A0D5000258995 /* ProfileImage.swift */; };
 		FECF8D9B2D0A0E3000258995 /* OAuth2TokenStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8D9A2D0A0E3000258995 /* OAuth2TokenStorage.swift */; };
+		FECF8D9D2D182C2000258995 /* ImagesListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8D9C2D182C2000258995 /* ImagesListService.swift */; };
+		FECF8DA02D182D2C00258995 /* PhotoResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8D9F2D182D2C00258995 /* PhotoResult.swift */; };
+		FECF8DA22D18307200258995 /* UrlsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8DA12D18307200258995 /* UrlsResult.swift */; };
+		FECF8DA42D18329000258995 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8DA32D18329000258995 /* Photo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +67,10 @@
 		FECF8D962D0A0D1A00258995 /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		FECF8D982D0A0D5000258995 /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		FECF8D9A2D0A0E3000258995 /* OAuth2TokenStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuth2TokenStorage.swift; sourceTree = "<group>"; };
+		FECF8D9C2D182C2000258995 /* ImagesListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListService.swift; sourceTree = "<group>"; };
+		FECF8D9F2D182D2C00258995 /* PhotoResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoResult.swift; sourceTree = "<group>"; };
+		FECF8DA12D18307200258995 /* UrlsResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlsResult.swift; sourceTree = "<group>"; };
+		FECF8DA32D18329000258995 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,8 +162,10 @@
 		FECD58F12CD26C4B00F6DC1E /* ImageList */ = {
 			isa = PBXGroup;
 			children = (
+				FECF8D9E2D182C4900258995 /* ImagesListModels */,
 				FECD58BC2CD11C9B00F6DC1E /* ImagesListViewController.swift */,
 				FECD58EF2CD26C0700F6DC1E /* ImagesListCell.swift */,
+				FECF8D9C2D182C2000258995 /* ImagesListService.swift */,
 			);
 			path = ImageList;
 			sourceTree = "<group>";
@@ -197,6 +207,16 @@
 				FECF8D832CFE3D5E00258995 /* UserResult.swift */,
 			);
 			path = UserProfileModels;
+			sourceTree = "<group>";
+		};
+		FECF8D9E2D182C4900258995 /* ImagesListModels */ = {
+			isa = PBXGroup;
+			children = (
+				FECF8D9F2D182D2C00258995 /* PhotoResult.swift */,
+				FECF8DA12D18307200258995 /* UrlsResult.swift */,
+				FECF8DA32D18329000258995 /* Photo.swift */,
+			);
+			path = ImagesListModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -280,10 +300,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				FECD58BD2CD11C9B00F6DC1E /* ImagesListViewController.swift in Sources */,
+				FECF8D9D2D182C2000258995 /* ImagesListService.swift in Sources */,
 				FECF8D972D0A0D1A00258995 /* Profile.swift in Sources */,
 				FECF8D822CFE3CEE00258995 /* ProfileService.swift in Sources */,
 				FECF8D952D0A0CE900258995 /* ProfileResult.swift in Sources */,
 				FECF8D9B2D0A0E3000258995 /* OAuth2TokenStorage.swift in Sources */,
+				FECF8DA42D18329000258995 /* Photo.swift in Sources */,
 				FECD58F02CD26C0700F6DC1E /* ImagesListCell.swift in Sources */,
 				FE4031C02CEA80C9009776FD /* OAuthTokenResponseBody.swift in Sources */,
 				FEB643A92CD692F600D1B913 /* ProfileViewController.swift in Sources */,
@@ -299,7 +321,9 @@
 				FECF8D992D0A0D5000258995 /* ProfileImage.swift in Sources */,
 				FE4031BA2CE62303009776FD /* WebViewViewController.swift in Sources */,
 				FE4031BC2CEA59BF009776FD /* OAuth2Service.swift in Sources */,
+				FECF8DA02D182D2C00258995 /* PhotoResult.swift in Sources */,
 				FECF8D862CFFA9F300258995 /* ProfileImageService.swift in Sources */,
+				FECF8DA22D18307200258995 /* UrlsResult.swift in Sources */,
 				FECD58BB2CD11C9B00F6DC1E /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
