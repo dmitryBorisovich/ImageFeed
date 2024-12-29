@@ -6,7 +6,7 @@ import Foundation
 
 struct PhotoResult: Decodable {
     let id: String
-    let createdAt: Date?
+    let createdAt: String /*Date?*/
     let width: Double
     let height: Double
     let description: String?

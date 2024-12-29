@@ -12,41 +12,18 @@ final class ImagesListService {
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     
     private (set) var photos: [Photo] = []
-    private var lastLoadedPage: Int?
+    private var lastLoadedPage: Int = 0
     
-    static let shared = ImagesListService()
-    private init() {}
+//    static let shared = ImagesListService()
+//    private init() {}
     
     private var task: URLSessionTask?
     
     // MARK: - Methods
     
-//    private func makeImagesListRequest() -> URLRequest? {
-//        
-//        let nextPage = (lastLoadedPage ?? 0) + 1
-//        guard
-//            let url = URL(
-//                string: "/photos" + "?page=\(nextPage)",
-//                relativeTo: Constants.defaultBaseURL
-//            )
-//        else {
-//            assertionFailure(">>> [ImagesListService] Failed to create URL")
-//            return nil
-//        }
-//        let request = URLRequest(url: url)
-//        return request
-//    }
-    
-    private func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
-        assert(Thread.isMainThread)
+    private func makeImagesListRequest(_ token: String) -> URLRequest? {
         
-        if task != nil {
-            print(">>> [ImagesListService] The request is already in progress, no extra request needed")
-            completion(.failure(ImagesListServiceError.extraRequest))
-            return
-        }
-        
-        let nextPage = (lastLoadedPage ?? 0) + 1
+        let nextPage = (lastLoadedPage) + 1
         guard
             let url = URL(
                 string: "/photos" + "?page=\(nextPage)",
@@ -54,16 +31,36 @@ final class ImagesListService {
             )
         else {
             assertionFailure(">>> [ImagesListService] Failed to create URL")
-            completion(.failure(ImagesListServiceError.invalidRequest))
+            return nil
+        }
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return request
+    }
+    
+    func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
+        assert(Thread.isMainThread)
+        
+        guard
+            let token = OAuth2TokenStorage.shared.token
+        else { return }
+        
+        if task != nil {
+            print(">>> [ImagesListService] The request is already in progress, no extra request needed")
+            completion(.failure(ImagesListServiceError.extraRequest))
             return
         }
-        let request = URLRequest(url: url)
+        
+        guard let request = makeImagesListRequest(token) else {
+            print(">>> [ImagesListService] Failed to create the request")
+            completion(.failure(ProfileServiceError.invalidRequest))
+            return
+        }
         
         let urlSession = URLSession.shared
         let task = urlSession.objectTask(for: request) { (result: Result<[PhotoResult], Error>) in
             switch result {
             case .success(let photos):
-                self.lastLoadedPage = nextPage
                 var receivedPhotos: [Photo] = []
                 for photo in photos {
 //                    let date = DateFormatter().date(from: photo.createdAt)
@@ -79,6 +76,7 @@ final class ImagesListService {
                     receivedPhotos.append(photo)
                 }
                 self.photos.append(contentsOf: receivedPhotos)
+                self.lastLoadedPage += 1
                 NotificationCenter.default
                     .post(
                         name: ImagesListService.didChangeNotification,
