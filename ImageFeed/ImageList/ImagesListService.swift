@@ -14,8 +14,8 @@ final class ImagesListService {
     private (set) var photos: [Photo] = []
     private var lastLoadedPage: Int = 0
     
-//    static let shared = ImagesListService()
-//    private init() {}
+    static let shared = ImagesListService()
+    private init() {}
     
     private var task: URLSessionTask?
     

@@ -1,4 +1,5 @@
 import UIKit
+import Kingfisher
 
 final class ImagesListCell: UITableViewCell {
     
@@ -43,7 +44,6 @@ final class ImagesListCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
         setUpCell()
     }
     
@@ -52,6 +52,11 @@ final class ImagesListCell: UITableViewCell {
     }
     
     // MARK: - Methods
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        cellImageView.kf.cancelDownloadTask()
+    }
     
     private func setUpCell() {
         self.backgroundColor = .ypBlack
@@ -105,13 +110,22 @@ final class ImagesListCell: UITableViewCell {
         self.gradientLayer = gradientLayer
     }
     
-    func configureCell(withIndex index: IndexPath) {
-        guard let cellImage = UIImage(named: "\(index.row)") else { return }
+    func configureCell(in tableView: UITableView, at indexPath: IndexPath, withPhoto photo: Photo) {
+        let imageUrl = URL(string: photo.thumbImageURL)
+        cellImageView.kf.setImage(with: imageUrl) { [weak tableView] result in
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    tableView?.reloadRows(at: [indexPath], with: .automatic)
+                }
+            case .failure(let error):
+                print(">>> Loading image in cell failed: \(error.localizedDescription)")
+            }
+        }
         
-        cellImageView.image = cellImage
         cellDateLabel.text = dateFormatter.string(from: Date())
         
-        let isLiked = index.row % 2 == 0
+        let isLiked = photo.isLiked
         let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
         cellLikeButton.setImage(likeImage, for: .normal)
         

@@ -4,8 +4,9 @@ final class ImagesListViewController: UIViewController {
 
     // MARK: - Properties
     
-    private let photosName: [String] = Array(0..<20).map { "\($0)" }
-    private let showSingleImageSegueIdentifier = "ShowSingleImage"
+    var photos: [Photo] = []
+    let service = ImagesListService.shared
+    private var imagesListServiceObserver: NSObjectProtocol?
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -18,6 +19,28 @@ final class ImagesListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpScreen()
+        
+        ImagesListService.shared.fetchPhotosNextPage { [weak self] result in
+            switch result {
+            case .success(let newPhotos):
+//                self?.photos += newPhotos
+                self?.updateTableViewAnimated()
+            case .failure(let error):
+                print(">>> Loading new images failed: \(error.localizedDescription)")
+            }
+        }
+        
+//        imagesListServiceObserver = NotificationCenter.default
+//            .addObserver(
+//                forName: ImagesListService.didChangeNotification,
+//                object: nil,
+//                queue: .main
+//            ) { [weak self] _ in
+//                guard let self else { return }
+//                print(">>> [ImagesListViewController] Notification received, updating photos")
+//                updateTableViewAnimated()
+//            }
+        
     }
     
     // MARK: - Methods
@@ -41,12 +64,26 @@ final class ImagesListViewController: UIViewController {
     private func switchToSingleImageVC(indexPath: IndexPath) {
         let singleImageVC = SingleImageViewController()
         
-        let image = UIImage(named: photosName[indexPath.row])
-        singleImageVC.image = image
+//        let image = UIImage(named: photosName[indexPath.row])
+//        singleImageVC.image = image
         
         singleImageVC.modalTransitionStyle = .coverVertical
         singleImageVC.modalPresentationStyle = .fullScreen
         present(singleImageVC, animated: true, completion: nil)
+    }
+    
+    private func updateTableViewAnimated() {
+        let oldCount = photos.count
+        let newCount = ImagesListService.shared.photos.count
+        photos = ImagesListService.shared.photos
+        if oldCount != newCount {
+            tableView.performBatchUpdates {
+                let indexPaths = (oldCount..<newCount).map { i in
+                    IndexPath(row: i, section: 0)
+                }
+                tableView.insertRows(at: indexPaths, with: .automatic)
+            } completion: { _ in }
+        }
     }
 }
 
@@ -55,7 +92,7 @@ final class ImagesListViewController: UIViewController {
 extension ImagesListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        photosName.count
+        photos.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -65,7 +102,8 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        imagesListCell.configureCell(withIndex: indexPath)
+        let image = photos[indexPath.row]
+        imagesListCell.configureCell(in: tableView, at: indexPath, withPhoto: image)
         return imagesListCell
     }
 }
@@ -73,7 +111,7 @@ extension ImagesListViewController: UITableViewDataSource {
 extension ImagesListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let image = UIImage(named: photosName[indexPath.row]) else { return 0 }
+        let image = photos[indexPath.row]
         
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
         
@@ -88,6 +126,15 @@ extension ImagesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        // TODO: fetchPhotosNextPage()
+        guard indexPath.row == photos.count - 1 else { return }
+        ImagesListService.shared.fetchPhotosNextPage { [weak self] result in
+            switch result {
+            case .success(let newPhotos):
+//                self?.photos += newPhotos
+                self?.updateTableViewAnimated()
+            case .failure(let error):
+                print(">>> Loading new images failed: \(error.localizedDescription)")
+            }
+        }
     }
 }
