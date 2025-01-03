@@ -5,7 +5,8 @@ final class ImagesListViewController: UIViewController {
     // MARK: - Properties
     
     var photos: [Photo] = []
-    let service = ImagesListService.shared
+    
+    private let service = ImagesListService.shared
     private var imagesListServiceObserver: NSObjectProtocol?
     
     private lazy var tableView: UITableView = {
@@ -20,26 +21,25 @@ final class ImagesListViewController: UIViewController {
         super.viewDidLoad()
         setUpScreen()
         
-        ImagesListService.shared.fetchPhotosNextPage { [weak self] result in
+        service.fetchPhotosNextPage { [weak self] result in
             switch result {
-            case .success(let newPhotos):
-//                self?.photos += newPhotos
+            case .success:
                 self?.updateTableViewAnimated()
             case .failure(let error):
                 print(">>> Loading new images failed: \(error.localizedDescription)")
             }
         }
         
-//        imagesListServiceObserver = NotificationCenter.default
-//            .addObserver(
-//                forName: ImagesListService.didChangeNotification,
-//                object: nil,
-//                queue: .main
-//            ) { [weak self] _ in
-//                guard let self else { return }
-//                print(">>> [ImagesListViewController] Notification received, updating photos")
-//                updateTableViewAnimated()
-//            }
+        imagesListServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ImagesListService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self else { return }
+                print(">>> [ImagesListViewController] Notification received, updating photos")
+                updateTableViewAnimated()
+            }
         
     }
     
@@ -65,6 +65,9 @@ final class ImagesListViewController: UIViewController {
         let singleImageVC = SingleImageViewController()
         
 //        let image = UIImage(named: photosName[indexPath.row])
+        
+        
+        singleImageVC.imageUrl = URL(string: photos[indexPath.row].largeImageURL)
 //        singleImageVC.image = image
         
         singleImageVC.modalTransitionStyle = .coverVertical
@@ -74,8 +77,8 @@ final class ImagesListViewController: UIViewController {
     
     private func updateTableViewAnimated() {
         let oldCount = photos.count
-        let newCount = ImagesListService.shared.photos.count
-        photos = ImagesListService.shared.photos
+        let newCount = service.photos.count
+        photos = service.photos
         if oldCount != newCount {
             tableView.performBatchUpdates {
                 let indexPaths = (oldCount..<newCount).map { i in
@@ -101,6 +104,7 @@ extension ImagesListViewController: UITableViewDataSource {
             print("Cell type casting failed")
             return UITableViewCell()
         }
+        imagesListCell.delegate = self
         
         let image = photos[indexPath.row]
         imagesListCell.configureCell(in: tableView, at: indexPath, withPhoto: image)
@@ -127,14 +131,49 @@ extension ImagesListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard indexPath.row == photos.count - 1 else { return }
-        ImagesListService.shared.fetchPhotosNextPage { [weak self] result in
+        print(">>> Updating cells from method 'will display' ")
+        service.fetchPhotosNextPage { [weak self] result in
             switch result {
-            case .success(let newPhotos):
-//                self?.photos += newPhotos
+            case .success:
                 self?.updateTableViewAnimated()
             case .failure(let error):
                 print(">>> Loading new images failed: \(error.localizedDescription)")
             }
         }
+    }
+}
+
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = photos[indexPath.row]
+        UIBlockingProgressHUD.show()
+        service.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success:
+                self.photos = self.service.photos
+                cell.setIsLiked(self.photos[indexPath.row].isLiked)
+                UIBlockingProgressHUD.dismiss()
+            case .failure:
+                UIBlockingProgressHUD.dismiss()
+                self.showLikeErrorAlert()
+            }
+        }
+    }
+    
+    private func showLikeErrorAlert() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так(",
+            message: "Не удалось поставить или убрать лайк",
+            preferredStyle: .alert
+        )
+        
+        let action = UIAlertAction(title: "OK", style: .default) { _ in
+            self.dismiss(animated: true)
+        }
+        alert.addAction(action)
+        
+        present(alert, animated: true)
     }
 }

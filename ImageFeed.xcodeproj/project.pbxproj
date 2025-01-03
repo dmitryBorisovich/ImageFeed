@@ -38,6 +38,7 @@
 		FECF8DA02D182D2C00258995 /* PhotoResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8D9F2D182D2C00258995 /* PhotoResult.swift */; };
 		FECF8DA22D18307200258995 /* UrlsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8DA12D18307200258995 /* UrlsResult.swift */; };
 		FECF8DA42D18329000258995 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECF8DA32D18329000258995 /* Photo.swift */; };
+		FEF2776B2D26FD7F0002D45E /* ProfileLogoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF2776A2D26FD7F0002D45E /* ProfileLogoutService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 		FECF8DA12D18307200258995 /* UrlsResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlsResult.swift; sourceTree = "<group>"; };
 		FECF8DA32D18329000258995 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		FECF8DA92D19E1A200258995 /* ImageFeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageFeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FEF2776A2D26FD7F0002D45E /* ProfileLogoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileLogoutService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +176,7 @@
 				FECD58C32CD11C9E00F6DC1E /* LaunchScreen.storyboard */,
 				FE4031C32CEBEAFB009776FD /* Helpers */,
 				FECF8D7F2CFCD68D00258995 /* UIBlockingProgressHUD.swift */,
+				FEF2776A2D26FD7F0002D45E /* ProfileLogoutService.swift */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
@@ -350,6 +353,7 @@
 			files = (
 				FECD58BD2CD11C9B00F6DC1E /* ImagesListViewController.swift in Sources */,
 				FECF8D9D2D182C2000258995 /* ImagesListService.swift in Sources */,
+				FEF2776B2D26FD7F0002D45E /* ProfileLogoutService.swift in Sources */,
 				FECF8D972D0A0D1A00258995 /* Profile.swift in Sources */,
 				FECF8D822CFE3CEE00258995 /* ProfileService.swift in Sources */,
 				FECF8D952D0A0CE900258995 /* ProfileResult.swift in Sources */,

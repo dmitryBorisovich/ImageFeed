@@ -1,6 +1,10 @@
 import UIKit
 import Kingfisher
 
+protocol ImagesListCellDelegate: AnyObject {
+    func imageListCellDidTapLike(_ cell: ImagesListCell)
+}
+
 final class ImagesListCell: UITableViewCell {
     
     // MARK: - Properties
@@ -10,6 +14,7 @@ final class ImagesListCell: UITableViewCell {
     private lazy var cellImageView: UIImageView = {
         let cellImageView = UIImageView()
         cellImageView.translatesAutoresizingMaskIntoConstraints = false
+        cellImageView.backgroundColor = .ypWhiteAlpha50
         cellImageView.layer.cornerRadius = 16
         cellImageView.layer.masksToBounds = true
         return cellImageView
@@ -19,6 +24,11 @@ final class ImagesListCell: UITableViewCell {
         let cellLikeButton = UIButton()
         cellLikeButton.translatesAutoresizingMaskIntoConstraints = false
         cellLikeButton.setImage(UIImage(named: "LikeNoActive"), for: .normal)
+        cellLikeButton.addTarget(
+            self,
+            action: #selector(likeButtonPressed),
+            for: .touchUpInside
+        )
         return cellLikeButton
     }()
     
@@ -31,6 +41,13 @@ final class ImagesListCell: UITableViewCell {
         return cellDateLabel
     }()
     
+    private lazy var placeholder: UIImageView = {
+        let placeholder = UIImageView()
+        placeholder.translatesAutoresizingMaskIntoConstraints = false
+        placeholder.image = UIImage(named: "LoadingImage")
+        return placeholder
+    }()
+    
     private var gradientLayer: CAGradientLayer?
     
     private lazy var dateFormatter: DateFormatter = {
@@ -39,6 +56,8 @@ final class ImagesListCell: UITableViewCell {
         formatter.timeStyle = .none
         return formatter
     }()
+    
+    weak var delegate: ImagesListCellDelegate?
     
     // MARK: - Initializers
     
@@ -55,13 +74,15 @@ final class ImagesListCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        cellImageView.image = nil
         cellImageView.kf.cancelDownloadTask()
+        placeholder.isHidden = false
     }
     
     private func setUpCell() {
         self.backgroundColor = .ypBlack
         contentView.backgroundColor = .ypBlack
-        [cellImageView, cellDateLabel, cellLikeButton].forEach { contentView.addSubview($0) }
+        [cellImageView, cellDateLabel, cellLikeButton, placeholder].forEach { contentView.addSubview($0) }
         setUpConstraints()
     }
     
@@ -79,7 +100,10 @@ final class ImagesListCell: UITableViewCell {
             cellLikeButton.widthAnchor.constraint(equalToConstant: 44),
             cellLikeButton.heightAnchor.constraint(equalToConstant: 44),
             cellLikeButton.topAnchor.constraint(equalTo: cellImageView.topAnchor),
-            cellLikeButton.trailingAnchor.constraint(equalTo: cellImageView.trailingAnchor)
+            cellLikeButton.trailingAnchor.constraint(equalTo: cellImageView.trailingAnchor),
+            
+            placeholder.centerXAnchor.constraint(equalTo: cellImageView.centerXAnchor),
+            placeholder.centerYAnchor.constraint(equalTo: cellImageView.centerYAnchor)
         ])
     }
     
@@ -111,24 +135,43 @@ final class ImagesListCell: UITableViewCell {
     }
     
     func configureCell(in tableView: UITableView, at indexPath: IndexPath, withPhoto photo: Photo) {
+        placeholder.isHidden = false
         let imageUrl = URL(string: photo.thumbImageURL)
-        cellImageView.kf.setImage(with: imageUrl) { [weak tableView] result in
+        cellImageView.kf.indicatorType = .activity
+        cellImageView.kf.setImage(
+            with: imageUrl
+        ) { [weak self] result in
             switch result {
             case .success:
-                DispatchQueue.main.async {
-                    tableView?.reloadRows(at: [indexPath], with: .automatic)
-                }
+                self?.placeholder.isHidden = true
+                tableView.reloadRows(at: [indexPath], with: .automatic)
             case .failure(let error):
                 print(">>> Loading image in cell failed: \(error.localizedDescription)")
             }
         }
         
-        cellDateLabel.text = dateFormatter.string(from: Date())
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        if let date = inputFormatter.date(from: photo.createdAt) {
+            let dateOfCreating = dateFormatter.string(from: date)
+            cellDateLabel.text = dateOfCreating
+        } else {
+            cellDateLabel.text = dateFormatter.string(from: Date())
+        }
         
         let isLiked = photo.isLiked
         let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
         cellLikeButton.setImage(likeImage, for: .normal)
         
         self.selectionStyle = .none
+    }
+    
+    func setIsLiked(_ isLiked: Bool) {
+        let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
+        cellLikeButton.setImage(likeImage, for: .normal)
+    }
+    
+    @objc private func likeButtonPressed() {
+        delegate?.imageListCellDidTapLike(self)
     }
 }

@@ -1,12 +1,12 @@
 import Foundation
 
-//struct Photos: Decodable {
-//    let photos: [PhotoResult]
-//}
+struct PhotoWrapper: Decodable {
+    let photo: PhotoResult
+}
 
 struct PhotoResult: Decodable {
     let id: String
-    let createdAt: String /*Date?*/
+    let createdAt: String
     let width: Double
     let height: Double
     let description: String?
