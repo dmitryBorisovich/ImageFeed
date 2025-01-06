@@ -74,7 +74,6 @@ final class ImagesListCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        cellImageView.image = nil
         cellImageView.kf.cancelDownloadTask()
         placeholder.isHidden = false
     }
@@ -84,6 +83,7 @@ final class ImagesListCell: UITableViewCell {
         contentView.backgroundColor = .ypBlack
         [cellImageView, cellDateLabel, cellLikeButton, placeholder].forEach { contentView.addSubview($0) }
         setUpConstraints()
+        configureGradient()
     }
     
     private func setUpConstraints() {
@@ -109,12 +109,15 @@ final class ImagesListCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        configureGradient()
+        gradientLayer?.frame = CGRect(
+            x: 0,
+            y: cellImageView.bounds.height - 30,
+            width: cellImageView.bounds.width,
+            height: 30
+        )
     }
     
     private func configureGradient() {
-        gradientLayer?.removeFromSuperlayer()
-            
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = CGRect(
             x: 0,
@@ -141,29 +144,31 @@ final class ImagesListCell: UITableViewCell {
         cellImageView.kf.setImage(
             with: imageUrl
         ) { [weak self] result in
+            guard let self else { return }
             switch result {
             case .success:
-                self?.placeholder.isHidden = true
+                placeholder.isHidden = true
                 tableView.reloadRows(at: [indexPath], with: .automatic)
             case .failure(let error):
-                print(">>> Loading image in cell failed: \(error.localizedDescription)")
+                print(">>> [ImageListCell] Loading image in cell failed: \(error.localizedDescription)")
             }
         }
-        
-        let inputFormatter = DateFormatter()
-        inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        if let date = inputFormatter.date(from: photo.createdAt) {
-            let dateOfCreating = dateFormatter.string(from: date)
-            cellDateLabel.text = dateOfCreating
-        } else {
-            cellDateLabel.text = dateFormatter.string(from: Date())
-        }
+
+        cellDateLabel.text = formatDate(photo.createdAt)
         
         let isLiked = photo.isLiked
         let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
         cellLikeButton.setImage(likeImage, for: .normal)
         
         self.selectionStyle = .none
+    }
+    
+    private func formatDate(_ date: String?) -> String {
+        guard let date else { return "" }
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        guard let formattedDate = dateFormatter.date(from: date) else { return "" }
+        dateFormatter.dateFormat = "d MMMM yyyy"
+        return dateFormatter.string(from: formattedDate)
     }
     
     func setIsLiked(_ isLiked: Bool) {

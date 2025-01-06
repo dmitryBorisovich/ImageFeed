@@ -4,17 +4,6 @@ final class SingleImageViewController: UIViewController {
     
     // MARK: - Properties
     
-//    var image: UIImage? {
-//        didSet {
-//            guard isViewLoaded, let image else { return }
-//            
-//            imageView.image = image
-//            imageView.frame.size = image.size
-//            
-//            rescaleAndCenterImageInScrollView(image: image)
-//        }
-//    }
-    
     var imageUrl: URL?
     
     private lazy var scrollView: UIScrollView = {
@@ -66,16 +55,8 @@ final class SingleImageViewController: UIViewController {
         view.backgroundColor = .ypBlack
         [scrollView, backButton, shareButton].forEach { view.addSubview($0) }
         scrollView.addSubview(imageView)
-        
         setUpConstraints()
-        
-//        guard let image else { return }
         loadImage()
-        
-//        imageView.image = image
-//        imageView.frame.size = image.size
-//        
-//        rescaleAndCenterImageInScrollView(image: imageView.image)
     }
     
     private func setUpConstraints() {
@@ -155,11 +136,11 @@ final class SingleImageViewController: UIViewController {
         guard let imageUrl else { return }
         
         UIBlockingProgressHUD.show()
-        
+
         imageView.kf.setImage(with: imageUrl) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
             
-            guard let self = self else { return }
+            guard let self else { return }
             switch result {
             case .success(let imageResult):
                 self.rescaleAndCenterImageInScrollView(image: imageResult.image)

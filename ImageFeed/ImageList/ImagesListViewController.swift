@@ -21,14 +21,7 @@ final class ImagesListViewController: UIViewController {
         super.viewDidLoad()
         setUpScreen()
         
-        service.fetchPhotosNextPage { [weak self] result in
-            switch result {
-            case .success:
-                self?.updateTableViewAnimated()
-            case .failure(let error):
-                print(">>> Loading new images failed: \(error.localizedDescription)")
-            }
-        }
+        service.fetchPhotosNextPage { _ in }
         
         imagesListServiceObserver = NotificationCenter.default
             .addObserver(
@@ -40,7 +33,6 @@ final class ImagesListViewController: UIViewController {
                 print(">>> [ImagesListViewController] Notification received, updating photos")
                 updateTableViewAnimated()
             }
-        
     }
     
     // MARK: - Methods
@@ -63,13 +55,7 @@ final class ImagesListViewController: UIViewController {
     
     private func switchToSingleImageVC(indexPath: IndexPath) {
         let singleImageVC = SingleImageViewController()
-        
-//        let image = UIImage(named: photosName[indexPath.row])
-        
-        
         singleImageVC.imageUrl = URL(string: photos[indexPath.row].largeImageURL)
-//        singleImageVC.image = image
-        
         singleImageVC.modalTransitionStyle = .coverVertical
         singleImageVC.modalPresentationStyle = .fullScreen
         present(singleImageVC, animated: true, completion: nil)
@@ -80,10 +66,8 @@ final class ImagesListViewController: UIViewController {
         let newCount = service.photos.count
         photos = service.photos
         if oldCount != newCount {
+            let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
             tableView.performBatchUpdates {
-                let indexPaths = (oldCount..<newCount).map { i in
-                    IndexPath(row: i, section: 0)
-                }
                 tableView.insertRows(at: indexPaths, with: .automatic)
             } completion: { _ in }
         }
@@ -105,7 +89,7 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         imagesListCell.delegate = self
-        
+    
         let image = photos[indexPath.row]
         imagesListCell.configureCell(in: tableView, at: indexPath, withPhoto: image)
         return imagesListCell
@@ -131,15 +115,7 @@ extension ImagesListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard indexPath.row == photos.count - 1 else { return }
-        print(">>> Updating cells from method 'will display' ")
-        service.fetchPhotosNextPage { [weak self] result in
-            switch result {
-            case .success:
-                self?.updateTableViewAnimated()
-            case .failure(let error):
-                print(">>> Loading new images failed: \(error.localizedDescription)")
-            }
-        }
+        service.fetchPhotosNextPage { _ in }
     }
 }
 
@@ -152,12 +128,12 @@ extension ImagesListViewController: ImagesListCellDelegate {
             guard let self else { return }
             switch result {
             case .success:
-                self.photos = self.service.photos
-                cell.setIsLiked(self.photos[indexPath.row].isLiked)
+                photos = service.photos
+                cell.setIsLiked(photos[indexPath.row].isLiked)
                 UIBlockingProgressHUD.dismiss()
             case .failure:
                 UIBlockingProgressHUD.dismiss()
-                self.showLikeErrorAlert()
+                showLikeErrorAlert()
             }
         }
     }

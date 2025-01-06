@@ -12,7 +12,7 @@ final class ImagesListService {
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     
     private (set) var photos: [Photo] = []
-    private var lastLoadedPage: Int = 0
+    private var lastLoadedPage = 0
     
     static let shared = ImagesListService()
     private init() {}
@@ -22,16 +22,15 @@ final class ImagesListService {
     // MARK: - Methods
     
     private func makeImagesListRequest(_ token: String) -> URLRequest? {
-        let nextPage = (lastLoadedPage) + 1
-        guard
-            let url = URL(
-                string: "/photos" + "?page=\(nextPage)",
-                relativeTo: Constants.defaultBaseURL
-            )
-        else {
-            assertionFailure(">>> [ImagesListService] Failed to create URL")
-            return nil
-        }
+        let nextPage = lastLoadedPage + 1
+
+        guard var urlComponents = URLComponents(string: Constants.defaultBaseURL + "photos") else { return nil }
+        urlComponents.queryItems = [
+            URLQueryItem(name: "page", value: "\(nextPage)")
+        ]
+        
+        guard let url = urlComponents.url else { return nil }
+        
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
@@ -57,7 +56,8 @@ final class ImagesListService {
         }
         
         let urlSession = URLSession.shared
-        let task = urlSession.objectTask(for: request) { (result: Result<[PhotoResult], Error>) in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
+            guard let self else { return }
             switch result {
             case .success(let photos):
                 var receivedPhotos: [Photo] = []
@@ -73,16 +73,21 @@ final class ImagesListService {
                     )
                     receivedPhotos.append(photo)
                 }
-                self.photos.append(contentsOf: receivedPhotos)
-                self.lastLoadedPage += 1
+                let uniquePhotos = receivedPhotos.filter { newPhoto in
+                    !(self.photos.contains(where: { $0.id == newPhoto.id }))
+                }
+                self.photos.append(contentsOf: uniquePhotos)
+
                 NotificationCenter.default
                     .post(
                         name: ImagesListService.didChangeNotification,
                         object: self,
                         userInfo: ["updatedPhotos": self.photos]
                     )
+                self.lastLoadedPage += 1
                 completion(.success(receivedPhotos))
             case .failure(let error):
+                print(">>> [ImagesListService] Failed to load photos: \(error.localizedDescription)")
                 completion(.failure(error))
             }
             
@@ -94,15 +99,12 @@ final class ImagesListService {
     }
     
     private func makeImagesListLikeRequest(_ token: String, _ photoId: String, _ isLike: Bool) -> URLRequest? {
-        guard
-            let url = URL(
-                string: "/photos" + "/\(photoId)" + "/like",
-                relativeTo: Constants.defaultBaseURL
-            )
-        else {
-            assertionFailure(">>> [ImagesListService] Failed to create URL")
-            return nil
-        }
+        guard 
+            let urlComponents = URLComponents(string: Constants.defaultBaseURL + "photos/\(photoId)/like")
+        else { return nil }
+        
+        guard let url = urlComponents.url else { return nil }
+        
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.httpMethod = isLike ? "POST" : "DELETE"
@@ -121,7 +123,8 @@ final class ImagesListService {
         }
         
         let urlSession = URLSession.shared
-        let task = urlSession.objectTask(for: request) { (result: Result<PhotoWrapper, Error>) in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<PhotoWrapper, Error>) in
+            guard let self else { return }
             switch result {
             case .success(_):
                 if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
@@ -139,6 +142,7 @@ final class ImagesListService {
                 }
                 completion(.success(()))
             case .failure(let error):
+                print(">>> [ImagesListService] Failed to get data with like")
                 completion(.failure(error))
             }
         }

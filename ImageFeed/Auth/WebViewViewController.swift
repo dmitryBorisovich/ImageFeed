@@ -45,7 +45,7 @@ final class WebViewViewController: UIViewController {
             options: [],
             changeHandler: { [weak self] _, _ in
                 guard let self else { return }
-                self.updateProgress()
+                updateProgress()
             }
         )
     }

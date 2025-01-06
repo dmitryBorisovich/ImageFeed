@@ -6,7 +6,7 @@ struct PhotoWrapper: Decodable {
 
 struct PhotoResult: Decodable {
     let id: String
-    let createdAt: String
+    let createdAt: String?
     let width: Double
     let height: Double
     let description: String?

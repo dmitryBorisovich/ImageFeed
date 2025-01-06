@@ -139,6 +139,7 @@
 				FECF8D932D0A0CBF00258995 /* UserProfileModels */,
 				FECF8D872D02348700258995 /* Services */,
 				FEB643A82CD692F600D1B913 /* ProfileViewController.swift */,
+				FEF2776A2D26FD7F0002D45E /* ProfileLogoutService.swift */,
 			);
 			path = UserProfile;
 			sourceTree = "<group>";
@@ -176,7 +177,6 @@
 				FECD58C32CD11C9E00F6DC1E /* LaunchScreen.storyboard */,
 				FE4031C32CEBEAFB009776FD /* Helpers */,
 				FECF8D7F2CFCD68D00258995 /* UIBlockingProgressHUD.swift */,
-				FEF2776A2D26FD7F0002D45E /* ProfileLogoutService.swift */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
