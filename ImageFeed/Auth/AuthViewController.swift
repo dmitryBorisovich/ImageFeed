@@ -34,7 +34,6 @@ final class AuthViewController: UIViewController {
         return startAuthButton
     }()
     
-    private let showWebViewSegueIdentifier = "ShowWebView"
     weak var delegate: AuthViewControllerDelegate?
     
     // MARK: - Lifecycle
@@ -116,16 +115,14 @@ extension AuthViewController: WebViewViewControllerDelegate {
         UIBlockingProgressHUD.show()
         
         OAuth2Service.shared.fetchOAuthToken(code: code) { [weak self] result in
-            
             UIBlockingProgressHUD.dismiss()
-            
+            guard let self else { return }
             switch result {
             case .success(let receivedToken):
-                guard let self else { return }
                 OAuth2TokenStorage.shared.token = receivedToken
                 delegate?.didAuthenticate(self)
             case .failure:
-                self?.showAuthErrorAlert()
+                showAuthErrorAlert()
             }
         }
     }

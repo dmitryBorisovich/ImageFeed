@@ -45,7 +45,7 @@ final class WebViewViewController: UIViewController {
             options: [],
             changeHandler: { [weak self] _, _ in
                 guard let self else { return }
-                self.updateProgress()
+                updateProgress()
             }
         )
     }
@@ -95,7 +95,6 @@ final class WebViewViewController: UIViewController {
         }
 
         let request = URLRequest(url: url)
-        print(">>> LOAD WEBVIEW")
         print("\(request)")
         webView.load(request)
     }
@@ -112,7 +111,6 @@ extension WebViewViewController: WKNavigationDelegate {
     ){
         if let code = code(from: navigationAction) {
             delegate?.webViewViewController(self, didAuthenticateWithCode: code)
-            print(">>> WE MADE CODE")
             decisionHandler(.cancel)
         } else {
             decisionHandler(.allow)

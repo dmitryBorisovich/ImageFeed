@@ -24,16 +24,12 @@ final class ProfileImageService {
             let token = OAuth2TokenStorage.shared.token
         else { return nil }
         
-        guard
-            let url = URL(
-                string: "/users/\(username)"
-                + "?client_id=\(Constants.accessKey)",
-                relativeTo: Constants.defaultBaseURL
-            )
-        else {
-            assertionFailure(">>> [ProfileImageService] Failed to create URL for username: \(username)")
-            return nil
-        }
+        guard var urlComponents = URLComponents(string: Constants.defaultBaseURL + "users/\(username)") else { return nil }
+        urlComponents.queryItems = [
+            URLQueryItem(name: "client_id", value: Constants.accessKey)
+        ]
+        
+        guard let url = urlComponents.url else { return nil }
 
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -58,11 +54,12 @@ final class ProfileImageService {
         }
         
         let urlSession = URLSession.shared
-        let task = urlSession.objectTask(for: request) { (result: Result<UserResult, Error>) in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
+            guard let self else { return }
             switch result {
             case .success(let userImage):
                 let profileImageURL = userImage.profileImage.small
-                self.avatarURL = profileImageURL
+                avatarURL = profileImageURL
                 NotificationCenter.default
                     .post(
                         name: ProfileImageService.didChangeNotification,
@@ -79,5 +76,9 @@ final class ProfileImageService {
         
         self.task = task
         task.resume()
+    }
+    
+    func cleanData() {
+        avatarURL = nil
     }
 }

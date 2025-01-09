@@ -18,16 +18,12 @@ final class ProfileService {
     // MARK: - Methods
     
     private func makeUsersProfileRequest(token: String) -> URLRequest? {
-        guard
-            let url = URL(
-                string: "/me"
-                + "?client_id=\(Constants.accessKey)",
-                relativeTo: Constants.defaultBaseURL
-            )
-        else {
-            assertionFailure(">>> [ProfileService] Failed to create URL")
-            return nil
-        }
+        guard var urlComponents = URLComponents(string: Constants.defaultBaseURL + "me") else { return nil }
+        urlComponents.queryItems = [
+            URLQueryItem(name: "client_id", value: Constants.accessKey)
+        ]
+        
+        guard let url = urlComponents.url else { return nil }
 
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -50,7 +46,8 @@ final class ProfileService {
         }
         
         let urlSession = URLSession.shared
-        let task = urlSession.objectTask(for: request) { (result: Result<ProfileResult, Error>) in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
+            guard let self else { return }
             switch result {
             case .success(let userInfo):
                 let profile = Profile(
@@ -70,5 +67,9 @@ final class ProfileService {
         
         self.task = task
         task.resume()
+    }
+    
+    func cleanData() {
+        profile = nil
     }
 }
