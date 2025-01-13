@@ -99,6 +99,10 @@ final class AuthViewController: UIViewController {
     
     @objc private func startAuthButtonPressed() {
         let webView = WebViewViewController()
+        let authHelper = AuthHelper()
+        let webViewPresenter = WebViewPresenter(authHelper: authHelper)
+        webView.presenter = webViewPresenter
+        webViewPresenter.view = webView
         webView.delegate = self
         if let navigationController {
             navigationController.modalPresentationStyle = .fullScreen
