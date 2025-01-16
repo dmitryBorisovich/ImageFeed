@@ -42,6 +42,13 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
         
         webView.navigationDelegate = self
         presenter?.viewDidLoad()
+        
+        webView.addObserver(
+            self,
+            forKeyPath: #keyPath(WKWebView.estimatedProgress),
+            options: .new,
+            context: nil
+        )
     }
     
     // MARK: - Methods
