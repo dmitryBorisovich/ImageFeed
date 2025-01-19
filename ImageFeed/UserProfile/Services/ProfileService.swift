@@ -13,7 +13,7 @@ final class ProfileService {
     private init() {}
     
     private var task: URLSessionTask?
-    private(set) var profile: Profile?
+    var profile: Profile?
     
     // MARK: - Methods
     

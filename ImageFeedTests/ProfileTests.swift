@@ -18,7 +18,9 @@ final class ImageFeedProfileTests: XCTestCase {
         let viewController = ProfileViewControllerSpy()
         let someProfile = Profile(username: "TimCook", name: "Tim Cook", loginName: "@TimCook", bio: "")
         let someAvatarURL = "https://www.placebear.com/200/300"
-        let presenter = ProfilePresenter(profile: someProfile, profileImageURL: someAvatarURL)
+        ProfileService.shared.profile = someProfile
+        ProfileImageService.shared.avatarURL = someAvatarURL
+        let presenter = ProfilePresenter()
         viewController.presenter = presenter
         presenter.view = viewController
 
@@ -32,7 +34,9 @@ final class ImageFeedProfileTests: XCTestCase {
         let viewController = ProfileViewControllerSpy()
         let someProfile = Profile(username: "TimCook", name: "Tim Cook", loginName: "@TimCook", bio: "")
         let someAvatarURL = "https://www.placebear.com/200/300"
-        let presenter = ProfilePresenter(profile: someProfile, profileImageURL: someAvatarURL)
+        ProfileService.shared.profile = someProfile
+        ProfileImageService.shared.avatarURL = someAvatarURL
+        let presenter = ProfilePresenter()
         viewController.presenter = presenter
         presenter.view = viewController
         
