@@ -67,6 +67,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             action: #selector(logOutButtonPressed)
         )
         logOutButton.tintColor = .ypRed
+        logOutButton.accessibilityIdentifier = "logout button"
         logOutButton.translatesAutoresizingMaskIntoConstraints = false
         return logOutButton
     }()

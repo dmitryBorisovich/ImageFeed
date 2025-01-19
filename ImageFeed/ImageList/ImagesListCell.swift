@@ -161,9 +161,7 @@ final class ImagesListCell: UITableViewCell {
 
         cellDateLabel.text = formatDate(creationDay)
         
-        let isLiked = isPhotoLiked
-        let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
-        cellLikeButton.setImage(likeImage, for: .normal)
+        setIsLiked(isPhotoLiked)
         
         self.selectionStyle = .none
     }
@@ -176,7 +174,14 @@ final class ImagesListCell: UITableViewCell {
     }
     
     func setIsLiked(_ isLiked: Bool) {
-        let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
+        var likeImage: UIImage?
+        if isLiked {
+            likeImage = UIImage(named: "LikeActive")
+            cellLikeButton.accessibilityIdentifier = "like button on"
+        } else {
+            likeImage = UIImage(named: "LikeNoActive")
+            cellLikeButton.accessibilityIdentifier = "like button off"
+        }
         cellLikeButton.setImage(likeImage, for: .normal)
     }
     

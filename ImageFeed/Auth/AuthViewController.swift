@@ -30,6 +30,7 @@ final class AuthViewController: UIViewController {
             action: #selector(startAuthButtonPressed),
             for: .touchUpInside
         )
+        startAuthButton.accessibilityIdentifier = "Authenticate"
         startAuthButton.translatesAutoresizingMaskIntoConstraints = false
         return startAuthButton
     }()
