@@ -245,6 +245,7 @@
 				FE4031B42CE5E1BF009776FD /* AuthConfiguration.swift */,
 				FE4031C42CEE649A009776FD /* SplashViewController.swift */,
 				FECF8D912D0787E700258995 /* TabBarController.swift */,
+				FECF8D7F2CFCD68D00258995 /* UIBlockingProgressHUD.swift */,
 				FE4031B82CE60E67009776FD /* Auth */,
 				FECD58F12CD26C4B00F6DC1E /* ImageList */,
 				FEB643AA2CD6E96100D1B913 /* UserProfile */,
@@ -252,7 +253,6 @@
 				FECD58F22CD26C8900F6DC1E /* Resources */,
 				FECD58C32CD11C9E00F6DC1E /* LaunchScreen.storyboard */,
 				FE4031C32CEBEAFB009776FD /* Helpers */,
-				FECF8D7F2CFCD68D00258995 /* UIBlockingProgressHUD.swift */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";

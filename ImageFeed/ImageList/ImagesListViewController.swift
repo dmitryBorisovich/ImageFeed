@@ -113,8 +113,11 @@ extension ImagesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard indexPath.row + 1 == presenter?.photosCount() else { return }
-        presenter?.loadPhotosPage()
+        let testMode = ProcessInfo.processInfo.arguments.contains("testMode")
+        if !testMode {
+            guard indexPath.row + 1 == presenter?.photosCount() else { return }
+            presenter?.loadPhotosPage()
+        }
     }
 }
 

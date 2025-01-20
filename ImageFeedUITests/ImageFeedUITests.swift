@@ -5,7 +5,7 @@ class ImageFeedUITests: XCTestCase {
     
     override func setUpWithError() throws {
         continueAfterFailure = false
-        
+        app.launchArguments = ["testMode"]
         app.launch()
     }
     
@@ -21,14 +21,14 @@ class ImageFeedUITests: XCTestCase {
         XCTAssertTrue(loginTextField.waitForExistence(timeout: 5))
             
         loginTextField.tap()
-        loginTextField.typeText("___")
+        loginTextField.typeText("") // write your email
         webView.swipeUp()
             
         let passwordTextField = webView.descendants(matching: .secureTextField).element
         XCTAssertTrue(passwordTextField.waitForExistence(timeout: 5))
             
         passwordTextField.tap()
-        passwordTextField.typeText("___)
+        passwordTextField.typeText("") // write your password
         webView.swipeUp()
             
         webView.buttons["Login"].tap()
@@ -56,7 +56,7 @@ class ImageFeedUITests: XCTestCase {
         sleep(5)
             
         cellToLike.tap()
-        sleep(2)
+        sleep(5)
             
         let image = app.scrollViews.images.element(boundBy: 0)
         image.pinch(withScale: 3, velocity: 1)
@@ -70,11 +70,13 @@ class ImageFeedUITests: XCTestCase {
         sleep(3)
         app.tabBars.buttons.element(boundBy: 1).tap()
            
-        XCTAssertTrue(app.staticTexts["Dmitry "].exists)
-        XCTAssertTrue(app.staticTexts["@dmitryborisovich"].exists)
+        XCTAssertTrue(app.staticTexts[""].exists) // write your "Name Surname" from profile
+        XCTAssertTrue(app.staticTexts[""].exists) // write your username from profile ("@username")
             
         app.buttons["logout button"].tap()
-            
         app.alerts["Пока, пока!"].scrollViews.otherElements.buttons["Да"].tap()
+        
+        let authViewController = app.otherElements["AuthViewController"]
+        XCTAssertTrue(authViewController.waitForExistence(timeout: 5))
     }
 }

@@ -47,6 +47,7 @@ final class AuthViewController: UIViewController {
     // MARK: - Private Methods
     
     private func setUpScreen() {
+        view.accessibilityIdentifier = "AuthViewController"
         view.backgroundColor = .ypBlack
         [logo, startAuthButton].forEach { view.addSubview($0) }
         setUpConstraints()

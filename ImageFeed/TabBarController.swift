@@ -1,7 +1,6 @@
 import UIKit
 
 final class TabBarController: UITabBarController {
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -33,5 +32,4 @@ final class TabBarController: UITabBarController {
         tabBar.tintColor = .ypWhite
         tabBar.unselectedItemTintColor = .ypWhiteAlpha50
     }
-    
 }
