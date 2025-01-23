@@ -1,7 +1,6 @@
 import UIKit
 
 final class TabBarController: UITabBarController {
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -11,6 +10,9 @@ final class TabBarController: UITabBarController {
             image: UIImage(named: "tab_editorial_active"),
             selectedImage: nil
         )
+        let imagesListPresenter = ImagesListPresenter()
+        imagesListViewController.presenter = imagesListPresenter
+        imagesListPresenter.view = imagesListViewController
         
         let profileViewController = ProfileViewController()
         profileViewController.tabBarItem = UITabBarItem(
@@ -18,6 +20,9 @@ final class TabBarController: UITabBarController {
             image: UIImage(named: "tab_profile_active"),
             selectedImage: nil
         )
+        let profilePresenter = ProfilePresenter()
+        profileViewController.presenter = profilePresenter
+        profilePresenter.view = profileViewController
         
         self.viewControllers = [imagesListViewController, profileViewController]
         
@@ -27,5 +32,4 @@ final class TabBarController: UITabBarController {
         tabBar.tintColor = .ypWhite
         tabBar.unselectedItemTintColor = .ypWhiteAlpha50
     }
-    
 }

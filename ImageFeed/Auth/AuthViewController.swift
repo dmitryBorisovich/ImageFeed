@@ -30,6 +30,7 @@ final class AuthViewController: UIViewController {
             action: #selector(startAuthButtonPressed),
             for: .touchUpInside
         )
+        startAuthButton.accessibilityIdentifier = "Authenticate"
         startAuthButton.translatesAutoresizingMaskIntoConstraints = false
         return startAuthButton
     }()
@@ -46,6 +47,7 @@ final class AuthViewController: UIViewController {
     // MARK: - Private Methods
     
     private func setUpScreen() {
+        view.accessibilityIdentifier = "AuthViewController"
         view.backgroundColor = .ypBlack
         [logo, startAuthButton].forEach { view.addSubview($0) }
         setUpConstraints()
@@ -99,6 +101,10 @@ final class AuthViewController: UIViewController {
     
     @objc private func startAuthButtonPressed() {
         let webView = WebViewViewController()
+        let authHelper = AuthHelper()
+        let webViewPresenter = WebViewPresenter(authHelper: authHelper)
+        webView.presenter = webViewPresenter
+        webViewPresenter.view = webView
         webView.delegate = self
         if let navigationController {
             navigationController.modalPresentationStyle = .fullScreen

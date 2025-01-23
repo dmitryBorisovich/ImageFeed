@@ -1,13 +1,18 @@
 import UIKit
 
-final class ImagesListViewController: UIViewController {
+public protocol ImagesListViewControllerProtocol: AnyObject {
+    var presenter: ImagesListPresenterProtocol? { get set }
+    var imagesListServiceObserver: NSObjectProtocol? { get set }
+    func updateTableViewAnimated(indexPaths: [IndexPath])
+}
+
+final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
 
     // MARK: - Properties
     
-    var photos: [Photo] = []
-    
-    private let service = ImagesListService.shared
-    private var imagesListServiceObserver: NSObjectProtocol?
+    var presenter: ImagesListPresenterProtocol?
+
+    var imagesListServiceObserver: NSObjectProtocol?
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -20,19 +25,7 @@ final class ImagesListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpScreen()
-        
-        service.fetchPhotosNextPage { _ in }
-        
-        imagesListServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ImagesListService.didChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] _ in
-                guard let self else { return }
-                print(">>> [ImagesListViewController] Notification received, updating photos")
-                updateTableViewAnimated()
-            }
+        presenter?.viewDidLoad()
     }
     
     // MARK: - Methods
@@ -55,22 +48,16 @@ final class ImagesListViewController: UIViewController {
     
     private func switchToSingleImageVC(indexPath: IndexPath) {
         let singleImageVC = SingleImageViewController()
-        singleImageVC.imageUrl = URL(string: photos[indexPath.row].largeImageURL)
+        singleImageVC.imageUrl = presenter?.getLargeImageUrl(for: indexPath)
         singleImageVC.modalTransitionStyle = .coverVertical
         singleImageVC.modalPresentationStyle = .fullScreen
         present(singleImageVC, animated: true, completion: nil)
     }
     
-    private func updateTableViewAnimated() {
-        let oldCount = photos.count
-        let newCount = service.photos.count
-        photos = service.photos
-        if oldCount != newCount {
-            let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
-            tableView.performBatchUpdates {
-                tableView.insertRows(at: indexPaths, with: .automatic)
-            } completion: { _ in }
-        }
+    func updateTableViewAnimated(indexPaths: [IndexPath]) {
+        tableView.performBatchUpdates {
+            tableView.insertRows(at: indexPaths, with: .automatic)
+        } completion: { _ in }
     }
 }
 
@@ -79,19 +66,27 @@ final class ImagesListViewController: UIViewController {
 extension ImagesListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        photos.count
+        presenter?.photosCount() ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath)
-        guard let imagesListCell = cell as? ImagesListCell else {
+        guard 
+            let imagesListCell = cell as? ImagesListCell,
+            let imageUrl = presenter?.getThumbImageUrl(for: indexPath)
+        else {
             print("Cell type casting failed")
             return UITableViewCell()
         }
         imagesListCell.delegate = self
     
-        let image = photos[indexPath.row]
-        imagesListCell.configureCell(in: tableView, at: indexPath, withPhoto: image)
+        imagesListCell.configureCell(
+            in: tableView,
+            at: indexPath,
+            imageUrl: imageUrl,
+            creationDay: presenter?.getPhotoCreationDate(for: indexPath) ?? "",
+            isPhotoLiked: presenter?.isPhotoLiked(with: indexPath) ?? false
+        )
         return imagesListCell
     }
 }
@@ -99,14 +94,18 @@ extension ImagesListViewController: UITableViewDataSource {
 extension ImagesListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let image = photos[indexPath.row]
+        guard 
+            let imageSize = presenter?.getSizeOfImage(for: indexPath)
+        else {
+            return tableView.estimatedRowHeight
+        }
         
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
         
         let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-        let scaleFactor = imageViewWidth / image.size.width
+        let scaleFactor = imageViewWidth / imageSize.width
         
-        return image.size.height * scaleFactor + imageInsets.top + imageInsets.bottom
+        return imageSize.height * scaleFactor + imageInsets.top + imageInsets.bottom
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -114,22 +113,23 @@ extension ImagesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard indexPath.row == photos.count - 1 else { return }
-        service.fetchPhotosNextPage { _ in }
+        let testMode = ProcessInfo.processInfo.arguments.contains("testMode")
+        if !testMode {
+            guard indexPath.row + 1 == presenter?.photosCount() else { return }
+            presenter?.loadPhotosPage()
+        }
     }
 }
 
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
-        service.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+        presenter?.changeLike(for: indexPath) { [weak self] result in
             guard let self else { return }
             switch result {
-            case .success:
-                photos = service.photos
-                cell.setIsLiked(photos[indexPath.row].isLiked)
+            case .success(let isPhotoLiked):
+                cell.setIsLiked(isPhotoLiked)
                 UIBlockingProgressHUD.dismiss()
             case .failure:
                 UIBlockingProgressHUD.dismiss()

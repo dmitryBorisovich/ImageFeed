@@ -1,11 +1,19 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+public protocol ProfileViewControllerProtocol: AnyObject {
+    var presenter: ProfilePresenterProtocol? { get set }
+    var profileImageServiceObserver: NSObjectProtocol? { get set }
+    func updateUserDetails(name: String, loginName: String, bio: String)
+    func updateAvatar(with url: URL)
+}
+
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     
-    // MARK: - Private properties
+    // MARK: - Properties
     
-    private var profileImageServiceObserver: NSObjectProtocol?
+    var presenter: ProfilePresenterProtocol?
+    var profileImageServiceObserver: NSObjectProtocol?
     
     private lazy var userImageView: UIImageView = {
         let userImageView = UIImageView()
@@ -59,6 +67,7 @@ final class ProfileViewController: UIViewController {
             action: #selector(logOutButtonPressed)
         )
         logOutButton.tintColor = .ypRed
+        logOutButton.accessibilityIdentifier = "logout button"
         logOutButton.translatesAutoresizingMaskIntoConstraints = false
         return logOutButton
     }()
@@ -67,27 +76,9 @@ final class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         print(">>> [ProfileViewController] ProfileVC did load")
-        
         setUpScreen()
-        
-        guard let profile = ProfileService.shared.profile else { return }
-        
-        updateUserDetails(profile: profile)
-        
-        profileImageServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ProfileImageService.didChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] _ in
-                guard let self else { return }
-                print(">>> [ProfileViewController] Notification received, updating avatar")
-                updateAvatar()
-            }
-        
-        updateAvatar()
+        presenter?.viewDidLoad()
     }
     
     // MARK: - Private methods
@@ -118,20 +109,14 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func updateUserDetails(profile: Profile) {
-        userNameLabel.text = profile.name
-        userIdLabel.text = profile.loginName
-        userDescriptionLabel.text = profile.bio
+    func updateUserDetails(name: String, loginName: String, bio: String) {
+        userNameLabel.text = name
+        userIdLabel.text = loginName
+        userDescriptionLabel.text = bio
     }
     
-    private func updateAvatar() {
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
-        else { return }
-        
-        print(">>> [ProfileViewController] Updating avatar with URL: \(profileImageURL)\n")
-    
+    func updateAvatar(with url: URL) {
+        print(">>> [ProfileViewController] Updating avatar...")
         userImageView.kf.setImage(
             with: url,
             placeholder: UIImage(systemName: "person.crop.circle.fill")

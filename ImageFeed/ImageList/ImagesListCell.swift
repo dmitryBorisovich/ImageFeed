@@ -137,12 +137,17 @@ final class ImagesListCell: UITableViewCell {
         self.gradientLayer = gradientLayer
     }
     
-    func configureCell(in tableView: UITableView, at indexPath: IndexPath, withPhoto photo: Photo) {
+    func configureCell(
+        in tableView: UITableView,
+        at indexPath: IndexPath,
+        imageUrl url: URL,
+        creationDay: String,
+        isPhotoLiked: Bool
+    ) {
         placeholder.isHidden = false
-        let imageUrl = URL(string: photo.thumbImageURL)
         cellImageView.kf.indicatorType = .activity
         cellImageView.kf.setImage(
-            with: imageUrl
+            with: url
         ) { [weak self] result in
             guard let self else { return }
             switch result {
@@ -154,17 +159,14 @@ final class ImagesListCell: UITableViewCell {
             }
         }
 
-        cellDateLabel.text = formatDate(photo.createdAt)
+        cellDateLabel.text = formatDate(creationDay)
         
-        let isLiked = photo.isLiked
-        let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
-        cellLikeButton.setImage(likeImage, for: .normal)
+        setIsLiked(isPhotoLiked)
         
         self.selectionStyle = .none
     }
     
-    private func formatDate(_ date: String?) -> String {
-        guard let date else { return "" }
+    private func formatDate(_ date: String) -> String {
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         guard let formattedDate = dateFormatter.date(from: date) else { return "" }
         dateFormatter.dateFormat = "d MMMM yyyy"
@@ -172,7 +174,14 @@ final class ImagesListCell: UITableViewCell {
     }
     
     func setIsLiked(_ isLiked: Bool) {
-        let likeImage = isLiked ? UIImage(named: "LikeActive") : UIImage(named: "LikeNoActive")
+        var likeImage: UIImage?
+        if isLiked {
+            likeImage = UIImage(named: "LikeActive")
+            cellLikeButton.accessibilityIdentifier = "like button on"
+        } else {
+            likeImage = UIImage(named: "LikeNoActive")
+            cellLikeButton.accessibilityIdentifier = "like button off"
+        }
         cellLikeButton.setImage(likeImage, for: .normal)
     }
     

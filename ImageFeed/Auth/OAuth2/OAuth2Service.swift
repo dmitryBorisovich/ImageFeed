@@ -21,28 +21,6 @@ final class OAuth2Service {
     
     // MARK: - Methods
     
-    private func makeOAuthTokenRequest(code: String) -> URLRequest? {
-        let baseURL = URL(string: OAuth2ServiceConstants.baseURL)
-        guard 
-            let url = URL(
-                string: "/oauth/token"
-                + "?client_id=\(Constants.accessKey)"
-                + "&client_secret=\(Constants.secretKey)"
-                + "&redirect_uri=\(Constants.redirectURI)"
-                + "&code=\(code)"
-                + "&grant_type=authorization_code",
-                relativeTo: baseURL
-            )
-        else {
-            assertionFailure(">>> [OAuth2Service] Failed to create URL")
-            return nil
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        return request
-    }
-    
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
@@ -76,5 +54,27 @@ final class OAuth2Service {
         
         self.task = task
         task.resume()
+    }
+    
+    private func makeOAuthTokenRequest(code: String) -> URLRequest? {
+        let baseURL = URL(string: OAuth2ServiceConstants.baseURL)
+        guard
+            let url = URL(
+                string: "/oauth/token"
+                + "?client_id=\(Constants.accessKey)"
+                + "&client_secret=\(Constants.secretKey)"
+                + "&redirect_uri=\(Constants.redirectURI)"
+                + "&code=\(code)"
+                + "&grant_type=authorization_code",
+                relativeTo: baseURL
+            )
+        else {
+            assertionFailure(">>> [OAuth2Service] Failed to create URL")
+            return nil
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        return request
     }
 }

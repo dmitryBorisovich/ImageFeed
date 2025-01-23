@@ -78,7 +78,6 @@ final class SplashViewController: UIViewController {
         }
         
         let tabBarController = TabBarController()
-           
         window.rootViewController = tabBarController
     }
     
